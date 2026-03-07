@@ -102,23 +102,52 @@ async function renderCharacterPicker(session) {
   const characters = await Promise.all(
     charIds.map(async id => {
       const res = await fetch(`/api/player/${dmUsername}/characters/${id}`);
-      return await res.json();
+      const c = await res.json();
+      c._claimed = session.characters[id].claimedBy || null;
+      return c;
     })
   );
 
-  container.innerHTML = characters.map(c => `
-    <div class="char-item" onclick="showCharacterSheet('${c._id}')">
-      <div class="char-info">
-        <span class="char-name">${esc(c.name)}</span>
-        <span class="char-meta">Level ${c.level} ${esc(c.species || '')} ${esc(c.class)}</span>
+  container.innerHTML = characters.map(c => {
+    if (c._claimed) {
+      return `
+        <div class="char-item" style="opacity:0.5;cursor:default;">
+          <div class="char-info">
+            <span class="char-name">${esc(c.name)}</span>
+            <span class="char-meta">Level ${c.level} ${esc(c.species || '')} ${esc(c.class)}</span>
+          </div>
+          <span style="color:var(--text-muted);font-size:0.85rem;">Claimed</span>
+        </div>
+      `;
+    }
+    return `
+      <div class="char-item" onclick="claimAndShow('${c._id}')">
+        <div class="char-info">
+          <span class="char-name">${esc(c.name)}</span>
+          <span class="char-meta">Level ${c.level} ${esc(c.species || '')} ${esc(c.class)}</span>
+        </div>
+        <span style="color:var(--gold);">Select</span>
       </div>
-      <span style="color:var(--gold);">Select</span>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   if (characters.length === 0) {
     container.innerHTML = '<p style="color:var(--text-muted)">No characters available.</p>';
   }
+}
+
+async function claimAndShow(characterId) {
+  const res = await fetch(`/api/player/${dmUsername}/claim`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pin: sessionPin, characterId, playerName: 'player-' + Date.now() })
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    alert(data.error || 'Could not select character');
+    return;
+  }
+  showCharacterSheet(characterId);
 }
 
 async function showCharacterSheet(characterId) {
