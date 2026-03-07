@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DnD - Player</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>D&D Session</h1>
+
+    <!-- Step 1: Enter PIN -->
+    <div id="step-join" class="card">
+      <h2>Join Session</h2>
+      <div class="form-group">
+        <label>Session PIN</label>
+        <input type="text" id="player-pin" placeholder="Enter PIN...">
+      </div>
+      <div id="join-error" style="color:var(--accent);font-size:0.9rem;margin-bottom:12px;display:none;"></div>
+      <button class="btn btn-primary" id="btn-join">Join</button>
+    </div>
+
+    <!-- Step 2: Pick character -->
+    <div id="step-pick" class="card" style="display:none;">
+      <h2>Choose Your Character</h2>
+      <div id="pick-list" class="char-list"></div>
+    </div>
+
+    <!-- Step 3: Character sheet -->
+    <div id="step-sheet" style="display:none;">
+      <div class="tabs">
+        <button class="tab active" data-tab="tab-stats">Stats</button>
+        <button class="tab" data-tab="tab-equipment">Equipment</button>
+        <button class="tab" data-tab="tab-spells">Spells</button>
+      </div>
+
+      <!-- Stats Tab -->
+      <div class="tab-content active" id="tab-stats">
+        <div class="combat-stats" id="combat-stats"></div>
+        <h3>Ability Scores</h3>
+        <div class="stat-grid" id="ability-grid"></div>
+        <h3>Skills</h3>
+        <div class="skills-grid" id="skills-grid"></div>
+        <h3 style="margin-top:16px;">Features</h3>
+        <ul class="features-list" id="features-list"></ul>
+      </div>
+
+      <!-- Equipment Tab -->
+      <div class="tab-content" id="tab-equipment">
+        <div id="equipment-display"></div>
+      </div>
+
+      <!-- Spells Tab -->
+      <div class="tab-content" id="tab-spells">
+        <div id="spellcasting-info"></div>
+        <div id="spell-slots-display"></div>
+        <div id="spells-display"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/constants.js"></script>
+  <script src="/js/player.js"></script>
+</body>
+</html>

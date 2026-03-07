@@ -1,0 +1,90 @@
+{
+  "name": "temo",
+  "class": "Wizard",
+  "species": "Human",
+  "level": 1,
+  "background": "Criminal",
+  "HP": 10,
+  "AC": 10,
+  "STR": 14,
+  "DEX": 10,
+  "CON": 10,
+  "INT": 10,
+  "WIS": 10,
+  "CHA": 10,
+  "skills": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
+  "features": [
+    {
+      "name": "Trance",
+      "description": "Don't sleep; complete long rest in 4 hours of meditation while retaining consciousness.",
+      "source": "species",
+      "sourceDetail": "Elf"
+    },
+    {
+      "name": "Luck",
+      "description": "Reroll d20 when you initially roll a 1 and use the new result.",
+      "source": "species",
+      "sourceDetail": "Halfling"
+    }
+  ],
+  "currency": {
+    "CP": 0,
+    "SP": 0,
+    "EP": 0,
+    "GP": 0,
+    "PP": 0
+  },
+  "equipment": [
+    {
+      "name": "Leather Armor",
+      "type": "Light Armor",
+      "description": "AC: 11 + DEX | 10 lb | 10 GP",
+      "quantity": 1
+    }
+  ],
+  "spells": [
+    {
+      "name": "Sleep",
+      "level": 1,
+      "school": "enchantment",
+      "description": "Each creature of your choice in a 5-foot-radius Sphere centered on a point within range must succeed on a Wisdom saving throw or have the Incapacitated condition until the end of its next turn, at which point it must repeat the save. If the target fails the second save, the target has the Unconscious condition for the duration. The spell ends on a target if it takes damage or someone within 5 feet of it takes an action to shake it out of the spell's effect.\n\nCreatures that don't sleep, such as elves, or that have Immunity to the Exhaustion condition automatically succeed on saves against this spell.",
+      "castingTime": "action",
+      "range": "60 feet",
+      "components": "V, S, M",
+      "concentration": true,
+      "ritual": false,
+      "duration": "up to 1 minute"
+    },
+    {
+      "name": "Alarm",
+      "level": 1,
+      "school": "abjuration",
+      "description": "You set an alarm against intrusion. Choose a door, a window, or an area within range that is no larger than a 20-foot Cube. Until the spell ends, an alarm alerts you whenever a creature touches or enters the warded area. When you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is audible or mental: \n\n Audible Alarm. The alarm produces the sound of a handbell for 10 seconds within 60 feet of the warded area. \n\n Mental Alarm. You are alerted by a mental ping if you are within 1 mile of the warded area. This ping awakens you if you're asleep.",
+      "castingTime": "action",
+      "range": "30 feet",
+      "components": "V, S, M",
+      "concentration": false,
+      "ritual": true,
+      "duration": "8 hours"
+    }
+  ]
+}

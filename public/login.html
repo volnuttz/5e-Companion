@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DnD - Dungeon Master Login</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .auth-container {
+      max-width: 400px;
+      margin: 60px auto;
+    }
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 0;
+      border-bottom: none;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .auth-tab:first-child {
+      border-radius: 10px 0 0 0;
+      border-right: none;
+    }
+    .auth-tab:last-child {
+      border-radius: 0 10px 0 0;
+    }
+    .auth-tab.active {
+      background: var(--bg-card);
+      color: var(--gold);
+      border-bottom-color: var(--bg-card);
+    }
+    .auth-card {
+      border-radius: 0 0 10px 10px;
+      border-top: none;
+    }
+    .auth-error {
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container auth-container">
+    <h1>Dungeon Master</h1>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-mode="login">Log In</div>
+      <div class="auth-tab" data-mode="signup">Sign Up</div>
+    </div>
+
+    <div class="card auth-card">
+      <div class="auth-error" id="auth-error"></div>
+      <form id="auth-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="f-username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="f-password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;" id="auth-submit">Log In</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let mode = 'login';
+
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        mode = tab.dataset.mode;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('auth-submit').textContent = mode === 'login' ? 'Log In' : 'Sign Up';
+        document.getElementById('auth-error').style.display = 'none';
+      });
+    });
+
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('f-username').value.trim();
+      const password = document.getElementById('f-password').value;
+      const errorEl = document.getElementById('auth-error');
+      errorEl.style.display = 'none';
+
+      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/signup';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      localStorage.setItem('dmToken', data.token);
+      localStorage.setItem('dmUsername', data.username);
+      window.location.href = '/dm';
+    });
+
+    // If already logged in, redirect
+    if (localStorage.getItem('dmToken')) {
+      window.location.href = '/dm';
+    }
+  </script>
+</body>
+</html>

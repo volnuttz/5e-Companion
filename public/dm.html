@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DnD - Dungeon Master</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h1 style="margin-bottom:0;">Dungeon Master</h1>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="dm-name" style="color:var(--text-muted);font-size:0.9rem;"></span>
+        <button class="btn btn-secondary btn-small" id="btn-logout">Logout</button>
+      </div>
+    </div>
+    <br>
+
+    <!-- Session Bar -->
+    <div class="session-bar">
+      <div>
+        <span id="session-status">No active session</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" id="btn-new-session">New Session</button>
+        <button class="btn btn-secondary" id="btn-show-qr" style="display:none;">Show QR</button>
+        <button class="btn btn-danger btn-small" id="btn-end-session" style="display:none;">End Session</button>
+      </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div class="modal-overlay" id="qr-modal">
+      <div class="modal" style="text-align:center;">
+        <div class="modal-header">
+          <h2>Session QR Code</h2>
+          <button class="modal-close" onclick="document.getElementById('qr-modal').classList.remove('active')">&times;</button>
+        </div>
+        <div class="qr-container">
+          <img id="qr-img" src="" alt="QR Code">
+          <div class="qr-url" id="qr-url"></div>
+          <div style="margin-top:12px;font-size:1.2rem;">PIN: <strong id="qr-pin" style="color:var(--accent);letter-spacing:2px;"></strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DM Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="dm-tab-characters">Characters</button>
+      <button class="tab" data-tab="dm-tab-battlefield">Battlefield</button>
+    </div>
+
+    <!-- Characters Tab -->
+    <div class="tab-content active" id="dm-tab-characters">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="margin:0;">Characters</h2>
+          <button class="btn btn-primary btn-small" id="btn-add-char">+ New Character</button>
+        </div>
+        <div id="char-list"></div>
+      </div>
+    </div>
+
+    <!-- Battlefield Tab -->
+    <div class="tab-content" id="dm-tab-battlefield">
+      <div class="card">
+        <h2 style="margin-bottom:12px;">Add Monsters</h2>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" id="monster-search" placeholder="Search monsters..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+          <select id="monster-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Types</option>
+          </select>
+          <select id="monster-cr-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All CR</option>
+          </select>
+        </div>
+        <div id="monster-results" class="list-section" style="max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h2 style="margin:0;">Battlefield</h2>
+          <button class="btn btn-danger btn-small" id="btn-clear-battlefield">Clear All</button>
+        </div>
+        <div id="battlefield-list"></div>
+        <p id="battlefield-empty" style="color:var(--text-muted);">No monsters on the battlefield. Search and add monsters above.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Character Edit Modal -->
+  <div class="modal-overlay" id="char-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="char-modal-title">New Character</h2>
+        <button class="modal-close" onclick="closeCharModal()">&times;</button>
+      </div>
+      <form id="char-form">
+        <input type="hidden" id="char-edit-id">
+
+        <!-- Basic Info -->
+        <div class="form-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="f-name" required>
+          </div>
+          <div class="form-group">
+            <label>Class</label>
+            <select id="f-class" required></select>
+          </div>
+          <div class="form-group">
+            <label>Species</label>
+            <select id="f-species" required></select>
+          </div>
+          <div class="form-group">
+            <label>Level</label>
+            <input type="number" id="f-level" value="1" min="1" max="20" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Background</label>
+          <input type="text" id="f-background">
+        </div>
+
+        <!-- Combat Stats -->
+        <div class="form-row" style="grid-template-columns:1fr 1fr;">
+          <div class="form-group">
+            <label>HP</label>
+            <input type="number" id="f-hp" value="10" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>AC</label>
+            <input type="number" id="f-ac" value="10" min="0" required>
+          </div>
+        </div>
+
+        <!-- Ability Scores -->
+        <h3>Ability Scores</h3>
+        <div class="form-row" style="grid-template-columns:repeat(6,1fr);">
+          <div class="form-group"><label>STR</label><input type="number" id="f-STR" value="10"></div>
+          <div class="form-group"><label>DEX</label><input type="number" id="f-DEX" value="10"></div>
+          <div class="form-group"><label>CON</label><input type="number" id="f-CON" value="10"></div>
+          <div class="form-group"><label>INT</label><input type="number" id="f-INT" value="10"></div>
+          <div class="form-group"><label>WIS</label><input type="number" id="f-WIS" value="10"></div>
+          <div class="form-group"><label>CHA</label><input type="number" id="f-CHA" value="10"></div>
+        </div>
+
+        <!-- Skills -->
+        <h3>Skills <span id="prof-bonus-display" style="font-size:0.85rem;color:var(--text-muted);font-weight:normal;">(Proficiency Bonus: +2)</span></h3>
+        <div id="skills-inputs" style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;"></div>
+
+        <!-- Features -->
+        <h3>Features</h3>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" id="feature-search" placeholder="Search features..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+          <select id="feature-source-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Sources</option>
+            <option value="class">Class Features</option>
+            <option value="species">Species Traits</option>
+            <option value="feat">Feats</option>
+          </select>
+        </div>
+        <div id="feature-results" class="list-section" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+        <div id="features-selected" class="list-section" style="margin-top:10px;"></div>
+
+        <!-- Currency -->
+        <h3>Currency</h3>
+        <div class="currency-row">
+          <div class="form-group"><label>CP</label><input type="number" id="f-cp" value="0" min="0"></div>
+          <div class="form-group"><label>SP</label><input type="number" id="f-sp" value="0" min="0"></div>
+          <div class="form-group"><label>EP</label><input type="number" id="f-ep" value="0" min="0"></div>
+          <div class="form-group"><label>GP</label><input type="number" id="f-gp" value="0" min="0"></div>
+          <div class="form-group"><label>PP</label><input type="number" id="f-pp" value="0" min="0"></div>
+        </div>
+
+        <!-- Equipment -->
+        <h3>Equipment</h3>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" id="equip-search" placeholder="Search items..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+          <select id="equip-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Types</option>
+            <option value="Weapon">Weapons</option>
+            <option value="Armor">Armor</option>
+            <option value="Item">Items</option>
+          </select>
+        </div>
+        <div id="equip-results" class="list-section" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+        <div id="equipment-list" class="list-section"></div>
+        <button type="button" class="btn btn-secondary btn-small" onclick="addEquipmentRow()">+ Add Custom</button>
+        <br><br>
+
+        <!-- Spells -->
+        <h3>Spells</h3>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" id="spell-search" placeholder="Search spells..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+          <select id="spell-level-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Levels</option>
+            <option value="0">Cantrip</option>
+            <option value="1">1st</option><option value="2">2nd</option><option value="3">3rd</option>
+            <option value="4">4th</option><option value="5">5th</option><option value="6">6th</option>
+            <option value="7">7th</option><option value="8">8th</option><option value="9">9th</option>
+          </select>
+          <select id="spell-class-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Classes</option>
+            <option value="bard">Bard</option><option value="cleric">Cleric</option>
+            <option value="druid">Druid</option><option value="paladin">Paladin</option>
+            <option value="ranger">Ranger</option><option value="sorcerer">Sorcerer</option>
+            <option value="warlock">Warlock</option><option value="wizard">Wizard</option>
+          </select>
+        </div>
+        <div id="spell-results" class="list-section" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+        <div id="spells-selected" class="list-section" style="margin-top:10px;"></div>
+        <br>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeCharModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Character</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Monster Stat Block Modal -->
+  <div class="modal-overlay" id="monster-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="monster-modal-title">Monster</h2>
+        <button class="modal-close" onclick="document.getElementById('monster-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div id="monster-stat-block"></div>
+    </div>
+  </div>
+
+  <script src="/js/constants.js"></script>
+  <script src="/js/dm.js"></script>
+</body>
+</html>
