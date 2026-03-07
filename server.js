@@ -26,6 +26,10 @@ let classFeatsDB = {};
 try { classFeatsDB = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-class-features.json'), 'utf-8')); } catch(e) {}
 
 app.use(express.json({ limit: '1mb' }));
+
+// Health check (no DB, responds immediately)
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Global rate limit: 100 requests per minute per IP
