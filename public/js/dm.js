@@ -491,16 +491,15 @@ function renderSelectedSpells() {
 }
 
 // --- Saving Throws ---
-function renderSavingThrows(savedProficiencies) {
+function renderSavingThrows() {
   const container = document.getElementById('saving-throws-inputs');
   const cls = document.getElementById('f-class').value;
   const classSaves = CLASS_SAVING_THROWS[cls] || [];
   container.innerHTML = ABILITIES.map((a, i) => {
-    // Use saved proficiency if provided, otherwise auto-set from class
-    const checked = savedProficiencies ? savedProficiencies[i] : classSaves.includes(a);
+    const proficient = classSaves.includes(a);
     return `
       <div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--bg-input);border-radius:4px;">
-        <input type="checkbox" id="f-save-prof-${i}" ${checked ? 'checked' : ''} onchange="updateSavingThrows()">
+        <span style="color:var(--accent);font-weight:600;min-width:14px;">${proficient ? '*' : ''}</span>
         <span style="flex:1;font-size:0.9rem;">${a}</span>
         <span id="f-save-mod-${i}" style="color:var(--gold);font-weight:600;font-size:0.9rem;min-width:28px;text-align:right;">+0</span>
       </div>`;
@@ -510,9 +509,11 @@ function renderSavingThrows(savedProficiencies) {
 
 function updateSavingThrows() {
   const profBonus = getProficiencyBonus();
+  const cls = document.getElementById('f-class').value;
+  const classSaves = CLASS_SAVING_THROWS[cls] || [];
   ABILITIES.forEach((a, i) => {
     const abilityMod = getAbilityMod(a);
-    const proficient = document.getElementById(`f-save-prof-${i}`)?.checked || false;
+    const proficient = classSaves.includes(a);
     const total = abilityMod + (proficient ? profBonus : 0);
     const modEl = document.getElementById(`f-save-mod-${i}`);
     if (modEl) modEl.textContent = total >= 0 ? `+${total}` : `${total}`;
@@ -628,8 +629,7 @@ async function openCharModal(id) {
     ['STR','DEX','CON','INT','WIS','CHA'].forEach(a => {
       document.getElementById(`f-${a}`).value = c[a] || 10;
     });
-    // Render saving throws and skills with proficiency data
-    renderSavingThrows(c.savingThrows);
+    renderSavingThrows();
     renderSkillInputs(c.skills || []);
     // Load features
     if (c.features) {
@@ -688,7 +688,6 @@ async function saveCharacter(e) {
     INT: parseInt(document.getElementById('f-INT').value),
     WIS: parseInt(document.getElementById('f-WIS').value),
     CHA: parseInt(document.getElementById('f-CHA').value),
-    savingThrows: ABILITIES.map((_, i) => document.getElementById(`f-save-prof-${i}`).checked),
     skills: SKILL_ABILITIES.map((_, i) => document.getElementById(`f-skill-prof-${i}`).checked),
     features: selectedFeatures.map(f => ({ name: f.name, description: f.description, source: f.source, sourceDetail: f.sourceDetail })),
     currency: {

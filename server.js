@@ -91,7 +91,6 @@ function charRowToJSON(row) {
     INT: row.int,
     WIS: row.wis,
     CHA: row.cha,
-    savingThrows: row.saving_throws,
     skills: row.skills,
     features: row.features,
     currency: row.currency,
@@ -244,11 +243,11 @@ app.post('/api/characters', authDM, async (req, res) => {
       return res.status(400).json({ error: 'Character limit reached (max 20)' });
     }
     await db.query(
-      `INSERT INTO characters (id, dm_id, name, class, species, level, background, hp, ac, str, dex, con, int, wis, cha, saving_throws, skills, features, currency, equipment, spells)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
+      `INSERT INTO characters (id, dm_id, name, class, species, level, background, hp, ac, str, dex, con, int, wis, cha, skills, features, currency, equipment, spells)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
       [id, req.dmId, c.name, c.class, c.species, c.level, c.background,
        c.HP, c.AC, c.STR, c.DEX, c.CON, c.INT, c.WIS, c.CHA,
-       JSON.stringify(c.savingThrows || []), JSON.stringify(c.skills || []), JSON.stringify(c.features || []),
+       JSON.stringify(c.skills || []), JSON.stringify(c.features || []),
        JSON.stringify(c.currency || {}), JSON.stringify(c.equipment || []),
        JSON.stringify(c.spells || [])]
     );
@@ -266,11 +265,11 @@ app.put('/api/characters/:id', authDM, async (req, res) => {
     const result = await db.query(
       `UPDATE characters SET name=$1, class=$2, species=$3, level=$4, background=$5,
        hp=$6, ac=$7, str=$8, dex=$9, con=$10, int=$11, wis=$12, cha=$13,
-       saving_throws=$14, skills=$15, features=$16, currency=$17, equipment=$18, spells=$19, updated_at=NOW()
-       WHERE id=$20 AND dm_id=$21 RETURNING *`,
+       skills=$14, features=$15, currency=$16, equipment=$17, spells=$18, updated_at=NOW()
+       WHERE id=$19 AND dm_id=$20 RETURNING *`,
       [c.name, c.class, c.species, c.level, c.background,
        c.HP, c.AC, c.STR, c.DEX, c.CON, c.INT, c.WIS, c.CHA,
-       JSON.stringify(c.savingThrows || []), JSON.stringify(c.skills || []), JSON.stringify(c.features || []),
+       JSON.stringify(c.skills || []), JSON.stringify(c.features || []),
        JSON.stringify(c.currency || {}), JSON.stringify(c.equipment || []),
        JSON.stringify(c.spells || []),
        req.params.id, req.dmId]

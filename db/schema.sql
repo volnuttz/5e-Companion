@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS characters (
   int INTEGER DEFAULT 10,
   wis INTEGER DEFAULT 10,
   cha INTEGER DEFAULT 10,
-  saving_throws JSONB DEFAULT '[]',
   skills JSONB DEFAULT '[]',
   features JSONB DEFAULT '[]',
   currency JSONB DEFAULT '{"CP":0,"SP":0,"EP":0,"GP":0,"PP":0}',
