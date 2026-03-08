@@ -344,8 +344,9 @@ app.get('/api/sessions/qr', authDM, async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM sessions WHERE dm_id = $1', [req.dmId]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'No active session' });
-    const ip = getLocalIP();
-    const url = `http://${ip}:${PORT}/join/${req.dmUsername}`;
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    const url = `${protocol}://${host}/join/${req.dmUsername}`;
     const qr = await QRCode.toDataURL(url);
     res.json({ qr, url, pin: result.rows[0].pin });
   } catch (err) {
