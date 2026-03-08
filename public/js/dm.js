@@ -1558,7 +1558,9 @@ function exportCharacter(id) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = (c.name || 'character').replace(/[^a-z0-9]/gi, '_') + '.toml';
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
 }
 
