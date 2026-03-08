@@ -48,6 +48,7 @@
     <div class="tabs">
       <button class="tab active" data-tab="dm-tab-characters">Characters</button>
       <button class="tab" data-tab="dm-tab-battlefield">Battlefield</button>
+      <button class="tab" data-tab="dm-tab-compendium">Compendium</button>
     </div>
 
     <!-- Characters Tab -->
@@ -85,6 +86,76 @@
         <div id="battlefield-list"></div>
         <p id="battlefield-empty" style="color:var(--text-muted);">No monsters on the battlefield. Search and add monsters above.</p>
       </div>
+    </div>
+
+    <!-- Compendium Tab -->
+    <div class="tab-content" id="dm-tab-compendium">
+      <div class="card">
+        <h2 style="margin-bottom:12px;">Compendium</h2>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" id="compendium-search" placeholder="Search spells, monsters, equipment, features..."
+            style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+          <select id="compendium-category"
+            style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All</option>
+            <option value="spell">Spells</option>
+            <option value="monster">Monsters</option>
+            <option value="equipment">Equipment</option>
+            <option value="feature">Features</option>
+          </select>
+        </div>
+        <div id="compendium-spell-filters" style="display:none;gap:8px;margin-bottom:10px;">
+          <select id="compendium-spell-level"
+            style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Levels</option>
+            <option value="0">Cantrip</option>
+            <option value="1">1st</option><option value="2">2nd</option><option value="3">3rd</option>
+            <option value="4">4th</option><option value="5">5th</option><option value="6">6th</option>
+            <option value="7">7th</option><option value="8">8th</option><option value="9">9th</option>
+          </select>
+          <select id="compendium-spell-class"
+            style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Classes</option>
+            <option value="bard">Bard</option><option value="cleric">Cleric</option>
+            <option value="druid">Druid</option><option value="paladin">Paladin</option>
+            <option value="ranger">Ranger</option><option value="sorcerer">Sorcerer</option>
+            <option value="warlock">Warlock</option><option value="wizard">Wizard</option>
+          </select>
+        </div>
+        <div id="compendium-monster-filters" style="display:none;gap:8px;margin-bottom:10px;">
+          <select id="compendium-monster-type"
+            style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Types</option>
+          </select>
+          <select id="compendium-monster-cr"
+            style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All CR</option>
+          </select>
+        </div>
+        <div id="compendium-feature-filters" style="display:none;gap:8px;margin-bottom:10px;">
+          <select id="compendium-feature-source"
+            style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option value="">All Sources</option>
+            <option value="class">Class Features</option>
+            <option value="species">Species Traits</option>
+            <option value="feat">Feats</option>
+          </select>
+        </div>
+        <p id="compendium-hint" style="color:var(--text-muted);margin:0;">Search or select a category to browse.</p>
+        <div id="compendium-results" class="list-section"
+          style="max-height:600px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compendium Detail Modal -->
+  <div class="modal-overlay" id="compendium-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="compendium-modal-title"></h2>
+        <button class="modal-close" onclick="document.getElementById('compendium-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div id="compendium-modal-body"></div>
     </div>
   </div>
 
