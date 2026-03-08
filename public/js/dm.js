@@ -127,6 +127,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('spell-search').addEventListener('input', filterSpells);
   document.getElementById('spell-level-filter').addEventListener('change', filterSpells);
   document.getElementById('spell-class-filter').addEventListener('change', filterSpells);
+
+  // Compendium
+  document.getElementById('compendium-search').addEventListener('input', filterCompendium);
+  document.getElementById('compendium-category').addEventListener('change', filterCompendium);
+  document.getElementById('compendium-spell-level').addEventListener('change', filterCompendium);
+  document.getElementById('compendium-spell-class').addEventListener('change', filterCompendium);
+  document.getElementById('compendium-monster-type').addEventListener('change', filterCompendium);
+  document.getElementById('compendium-monster-cr').addEventListener('change', filterCompendium);
+  document.getElementById('compendium-feature-source').addEventListener('change', filterCompendium);
+  populateCompendiumMonsterFilters();
 });
 
 function logout() {
@@ -1067,12 +1077,7 @@ function bfHP(uid, delta) {
   saveBattlefield();
 }
 
-function showMonsterStats(uid) {
-  const m = battlefieldMonsters.find(b => b._uid === uid);
-  if (!m) return;
-
-  document.getElementById('monster-modal-title').textContent = m._label;
-
+function buildMonsterStatBlockHTML(m) {
   const abilityMod = (score) => {
     const mod = Math.floor((score - 10) / 2);
     return mod >= 0 ? `+${mod}` : `${mod}`;
@@ -1128,8 +1133,199 @@ function showMonsterStats(uid) {
     html += m.legendaryActions.map(a => `<div class="stat-block-action"><strong>${esc(a.name)}.</strong> ${esc(a.description)}</div>`).join('');
   }
 
-  document.getElementById('monster-stat-block').innerHTML = html;
+  return html;
+}
+
+function showMonsterStats(uid) {
+  const m = battlefieldMonsters.find(b => b._uid === uid);
+  if (!m) return;
+  document.getElementById('monster-modal-title').textContent = m._label;
+  document.getElementById('monster-stat-block').innerHTML = buildMonsterStatBlockHTML(m);
   document.getElementById('monster-modal').classList.add('active');
+}
+
+// --- Compendium ---
+
+function populateCompendiumMonsterFilters() {
+  const types = [...new Set(allMonsters.map(m => m.type).filter(Boolean))].sort();
+  const typeEl = document.getElementById('compendium-monster-type');
+  types.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t;
+    o.textContent = t;
+    typeEl.appendChild(o);
+  });
+
+  const crOrder = ['0','1/8','1/4','1/2','1','2','3','4','5','6','7','8','9','10',
+    '11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','30'];
+  const crs = [...new Set(allMonsters.map(m => String(m.CR)).filter(Boolean))];
+  crs.sort((a, b) => {
+    const ai = crOrder.indexOf(a), bi = crOrder.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+  const crEl = document.getElementById('compendium-monster-cr');
+  crs.forEach(cr => {
+    const o = document.createElement('option');
+    o.value = cr;
+    o.textContent = `CR ${cr}`;
+    crEl.appendChild(o);
+  });
+}
+
+function filterCompendium() {
+  const query = document.getElementById('compendium-search').value.trim().toLowerCase();
+  const category = document.getElementById('compendium-category').value;
+
+  // Show/hide sub-filters
+  document.getElementById('compendium-spell-filters').style.display = category === 'spell' ? 'flex' : 'none';
+  document.getElementById('compendium-monster-filters').style.display = category === 'monster' ? 'flex' : 'none';
+  document.getElementById('compendium-feature-filters').style.display = category === 'feature' ? 'flex' : 'none';
+
+  const resultsEl = document.getElementById('compendium-results');
+  const hintEl = document.getElementById('compendium-hint');
+
+  if (!query && !category) {
+    resultsEl.style.display = 'none';
+    hintEl.style.display = '';
+    return;
+  }
+
+  // Build tagged candidate list: { type, item }
+  let candidates = [];
+
+  if (!category || category === 'spell') {
+    allSpells.forEach(s => candidates.push({ type: 'spell', item: s }));
+  }
+  if (!category || category === 'monster') {
+    allMonsters.forEach(m => candidates.push({ type: 'monster', item: m }));
+  }
+  if (!category || category === 'equipment') {
+    allEquipment.forEach(e => candidates.push({ type: 'equipment', item: e }));
+  }
+  if (!category || category === 'feature') {
+    allFeatures.forEach(f => candidates.push({ type: 'feature', item: f }));
+  }
+
+  // Text filter
+  if (query) {
+    candidates = candidates.filter(({ item }) => {
+      const nameMatch = item.name && item.name.toLowerCase().includes(query);
+      const descMatch = item.description && item.description.toLowerCase().includes(query);
+      return nameMatch || descMatch;
+    });
+  }
+
+  // Spell sub-filters
+  if (category === 'spell') {
+    const lvl = document.getElementById('compendium-spell-level').value;
+    const cls = document.getElementById('compendium-spell-class').value;
+    if (lvl !== '') candidates = candidates.filter(({ item }) => String(item.level) === lvl);
+    if (cls) candidates = candidates.filter(({ item }) => item.classes && item.classes.includes(cls));
+  }
+
+  // Monster sub-filters
+  if (category === 'monster') {
+    const type = document.getElementById('compendium-monster-type').value;
+    const cr = document.getElementById('compendium-monster-cr').value;
+    if (type) candidates = candidates.filter(({ item }) => item.type === type);
+    if (cr) candidates = candidates.filter(({ item }) => String(item.CR) === cr);
+  }
+
+  // Feature sub-filter
+  if (category === 'feature') {
+    const src = document.getElementById('compendium-feature-source').value;
+    if (src) candidates = candidates.filter(({ item }) => item.source === src);
+  }
+
+  const shown = candidates.slice(0, 100);
+
+  if (shown.length === 0) {
+    resultsEl.innerHTML = '<div style="padding:12px;color:var(--text-muted);">No results found.</div>';
+    resultsEl.style.display = 'block';
+    hintEl.style.display = 'none';
+    return;
+  }
+
+  resultsEl.innerHTML = shown.map(({ type, item }, idx) => {
+    let subtitle = '';
+    if (type === 'spell') {
+      const lvlLabel = item.level === 0 ? 'Cantrip' : `Level ${item.level}`;
+      const school = item.school ? ` ${item.school.charAt(0).toUpperCase() + item.school.slice(1)}` : '';
+      const classes = item.classes && item.classes.length ? ` · ${item.classes.join(', ')}` : '';
+      subtitle = `${lvlLabel}${school}${classes}`;
+    } else if (type === 'monster') {
+      subtitle = [item.size, item.type, `CR ${item.CR}`].filter(Boolean).join(' · ');
+    } else if (type === 'equipment') {
+      subtitle = [item.type, item.category, item.cost].filter(Boolean).join(' · ');
+    } else if (type === 'feature') {
+      const srcLabel = item.source === 'class' ? 'Class Feature' : item.source === 'species' ? 'Species Trait' : 'Feat';
+      subtitle = `${srcLabel}${item.sourceDetail ? ' · ' + item.sourceDetail : ''}`;
+    }
+    return `<div class="list-item" style="cursor:pointer;" data-idx="${idx}" onclick="showCompendiumDetail(compendiumCurrentResults[${idx}].type, compendiumCurrentResults[${idx}].item)">
+      <span>${esc(item.name)}</span>
+      <span style="color:var(--text-muted);font-size:0.85rem;">${esc(subtitle)}</span>
+    </div>`;
+  }).join('');
+
+  // Store for onclick reference
+  window.compendiumCurrentResults = shown;
+
+  resultsEl.style.display = 'block';
+  hintEl.style.display = 'none';
+}
+
+function showCompendiumDetail(type, item) {
+  const modal = document.getElementById('compendium-modal');
+  const titleEl = document.getElementById('compendium-modal-title');
+  const bodyEl = document.getElementById('compendium-modal-body');
+
+  titleEl.textContent = item.name;
+
+  let html = '';
+
+  if (type === 'spell') {
+    const lvlLabel = item.level === 0 ? 'Cantrip' : `Level ${item.level}`;
+    const school = item.school ? ` ${item.school.charAt(0).toUpperCase() + item.school.slice(1)}` : '';
+    html += `<div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:12px;">${esc(lvlLabel + school)}</div>`;
+    html += '<div class="stat-block-divider"></div>';
+    if (item.classes && item.classes.length) html += `<div class="stat-block-line"><strong>Classes</strong> ${esc(item.classes.join(', '))}</div>`;
+    if (item.actionType) html += `<div class="stat-block-line"><strong>Casting Time</strong> ${esc(item.actionType)}</div>`;
+    if (item.range) html += `<div class="stat-block-line"><strong>Range</strong> ${esc(item.range)}</div>`;
+    if (item.components && item.components.length) {
+      html += `<div class="stat-block-line"><strong>Components</strong> ${esc(item.components.map(c => c.toUpperCase()).join(', '))}${item.material ? ' (' + esc(item.material) + ')' : ''}</div>`;
+    }
+    if (item.duration) html += `<div class="stat-block-line"><strong>Duration</strong> ${item.concentration ? 'Concentration, ' : ''}${esc(item.duration)}</div>`;
+    const tags = [];
+    if (item.ritual) tags.push('Ritual');
+    if (item.concentration) tags.push('Concentration');
+    if (tags.length) html += `<div style="margin:6px 0;">${tags.map(t => `<span style="display:inline-block;background:var(--accent);color:#fff;border-radius:4px;padding:1px 7px;font-size:0.78rem;margin-right:4px;">${esc(t)}</span>`).join('')}</div>`;
+    html += '<div class="stat-block-divider"></div>';
+    html += `<div style="margin-top:8px;line-height:1.6;">${esc(item.description)}</div>`;
+    if (item.cantripUpgrade) html += `<div style="margin-top:8px;color:var(--text-muted);font-size:0.9rem;line-height:1.6;"><em>${esc(item.cantripUpgrade)}</em></div>`;
+
+  } else if (type === 'monster') {
+    html = buildMonsterStatBlockHTML(item);
+
+  } else if (type === 'equipment') {
+    html += '<div class="stat-block-divider"></div>';
+    if (item.type) html += `<div class="stat-block-line"><strong>Type</strong> ${esc(item.type)}${item.category ? ' — ' + esc(item.category) : ''}</div>`;
+    if (item.damage) html += `<div class="stat-block-line"><strong>Damage</strong> ${esc(item.damage)}</div>`;
+    if (item.properties) html += `<div class="stat-block-line"><strong>Properties</strong> ${esc(item.properties)}</div>`;
+    if (item.cost) html += `<div class="stat-block-line"><strong>Cost</strong> ${esc(item.cost)}</div>`;
+    if (item.weight) html += `<div class="stat-block-line"><strong>Weight</strong> ${esc(item.weight)}</div>`;
+
+  } else if (type === 'feature') {
+    const srcLabel = item.source === 'class' ? 'Class Feature' : item.source === 'species' ? 'Species Trait' : 'Feat';
+    html += `<div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:12px;">${esc(srcLabel)}${item.sourceDetail ? ' · ' + esc(item.sourceDetail) : ''}${item._level ? ' (Level ' + item._level + ')' : ''}</div>`;
+    html += '<div class="stat-block-divider"></div>';
+    html += `<div style="margin-top:8px;line-height:1.6;">${esc(item.description)}</div>`;
+  }
+
+  bodyEl.innerHTML = html;
+  modal.classList.add('active');
 }
 
 // --- Util ---
