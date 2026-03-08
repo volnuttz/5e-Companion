@@ -56,7 +56,11 @@
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <h2 style="margin:0;">Characters</h2>
-          <button class="btn btn-primary btn-small" id="btn-add-char">+ New Character</button>
+          <div style="display:flex;gap:6px;">
+            <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
+            <button class="btn btn-secondary btn-small" onclick="document.getElementById('import-char-file').click()">Import TOML</button>
+            <button class="btn btn-primary btn-small" id="btn-add-char">+ New Character</button>
+          </div>
         </div>
         <div id="char-list"></div>
       </div>

@@ -580,6 +580,7 @@ function renderCharacterList(chars) {
       </div>
       <div style="display:flex;gap:6px;">
         <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();openCharModal('${c._id}')">Edit</button>
+        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();exportCharacter('${c._id}')">Export</button>
         <button class="btn btn-danger btn-small" onclick="event.stopPropagation();deleteCharacter('${c._id}')">Delete</button>
       </div>
     </div>
@@ -1333,4 +1334,255 @@ function esc(str) {
   const div = document.createElement('div');
   div.textContent = str || '';
   return div.innerHTML;
+}
+
+// --- TOML Export / Import ---
+
+function serializeCharToTOML(c) {
+  const lines = [];
+
+  function tomlStr(v) {
+    if (v == null) return '""';
+    return '"' + String(v)
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t') + '"';
+  }
+
+  // Top-level scalars
+  lines.push(`name       = ${tomlStr(c.name)}`);
+  lines.push(`class      = ${tomlStr(c.class)}`);
+  lines.push(`species    = ${tomlStr(c.species)}`);
+  lines.push(`level      = ${parseInt(c.level) || 1}`);
+  lines.push(`background = ${tomlStr(c.background)}`);
+  lines.push(`HP         = ${parseInt(c.HP) || 0}`);
+  lines.push(`AC         = ${parseInt(c.AC) || 0}`);
+  lines.push('');
+  lines.push(`STR = ${parseInt(c.STR) || 10}`);
+  lines.push(`DEX = ${parseInt(c.DEX) || 10}`);
+  lines.push(`CON = ${parseInt(c.CON) || 10}`);
+  lines.push(`INT = ${parseInt(c.INT) || 10}`);
+  lines.push(`WIS = ${parseInt(c.WIS) || 10}`);
+  lines.push(`CHA = ${parseInt(c.CHA) || 10}`);
+  lines.push('');
+
+  // [skills] — named keys so DMs can read/edit them
+  const skills = Array.isArray(c.skills) ? c.skills : [];
+  lines.push('[skills]');
+  SKILL_ABILITIES.forEach((s, i) => {
+    const key = s.name.includes(' ') ? `"${s.name}"` : s.name;
+    lines.push(`${key} = ${skills[i] ? 'true' : 'false'}`);
+  });
+  lines.push('');
+
+  // [currency]
+  const cur = c.currency || {};
+  lines.push('[currency]');
+  lines.push(`CP = ${parseInt(cur.CP) || 0}`);
+  lines.push(`SP = ${parseInt(cur.SP) || 0}`);
+  lines.push(`EP = ${parseInt(cur.EP) || 0}`);
+  lines.push(`GP = ${parseInt(cur.GP) || 0}`);
+  lines.push(`PP = ${parseInt(cur.PP) || 0}`);
+  lines.push('');
+
+  // [[features]]
+  for (const f of (c.features || [])) {
+    lines.push('[[features]]');
+    lines.push(`name         = ${tomlStr(f.name)}`);
+    lines.push(`description  = ${tomlStr(f.description)}`);
+    lines.push(`source       = ${tomlStr(f.source)}`);
+    lines.push(`sourceDetail = ${tomlStr(f.sourceDetail)}`);
+    lines.push('');
+  }
+
+  // [[equipment]]
+  for (const e of (c.equipment || [])) {
+    lines.push('[[equipment]]');
+    lines.push(`name        = ${tomlStr(e.name)}`);
+    lines.push(`type        = ${tomlStr(e.type)}`);
+    lines.push(`description = ${tomlStr(e.description)}`);
+    lines.push(`quantity    = ${parseInt(e.quantity) || 1}`);
+    lines.push('');
+  }
+
+  // [[spells]]
+  for (const s of (c.spells || [])) {
+    lines.push('[[spells]]');
+    lines.push(`name          = ${tomlStr(s.name)}`);
+    lines.push(`level         = ${parseInt(s.level) || 0}`);
+    lines.push(`school        = ${tomlStr(s.school)}`);
+    lines.push(`description   = ${tomlStr(s.description)}`);
+    lines.push(`castingTime   = ${tomlStr(s.castingTime)}`);
+    lines.push(`range         = ${tomlStr(s.range)}`);
+    lines.push(`components    = ${tomlStr(s.components)}`);
+    lines.push(`concentration = ${s.concentration ? 'true' : 'false'}`);
+    lines.push(`ritual        = ${s.ritual ? 'true' : 'false'}`);
+    lines.push(`duration      = ${tomlStr(s.duration)}`);
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+function parseCharFromTOML(text) {
+  const rawLines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+
+  // Strip inline comments, respecting quoted strings
+  function stripComment(line) {
+    let inStr = false, escape = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (escape) { escape = false; continue; }
+      if (ch === '\\' && inStr) { escape = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (ch === '#' && !inStr) return line.slice(0, i).trimEnd();
+    }
+    return line;
+  }
+
+  function unescapeStr(s) {
+    // Order matters: unescape \\ last to avoid double-processing
+    return s
+      .replace(/\\n/g, '\n')
+      .replace(/\\r/g, '\r')
+      .replace(/\\t/g, '\t')
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, '\\');
+  }
+
+  function parseValue(raw) {
+    const v = raw.trim();
+    if (v === 'true') return true;
+    if (v === 'false') return false;
+    if (v.startsWith('"') && v.endsWith('"')) return unescapeStr(v.slice(1, -1));
+    const n = Number(v);
+    if (!isNaN(n) && v !== '') return Math.round(n);
+    throw new Error(`Cannot parse value: ${v}`);
+  }
+
+  // Result with safe defaults
+  const c = {
+    name: '', class: '', species: '', level: 1, background: '',
+    HP: 0, AC: 0,
+    STR: 10, DEX: 10, CON: 10, INT: 10, WIS: 10, CHA: 10,
+    skills: Array(18).fill(false),
+    currency: { CP: 0, SP: 0, EP: 0, GP: 0, PP: 0 },
+    features: [], equipment: [], spells: []
+  };
+
+  // Map for building the skills array from named keys
+  const skillMap = {};
+
+  let section = null;
+  let currentItem = null;
+
+  function flushItem() {
+    if (currentItem !== null && ['features', 'equipment', 'spells'].includes(section)) {
+      c[section].push(currentItem);
+    }
+    currentItem = null;
+  }
+
+  for (const rawLine of rawLines) {
+    const line = stripComment(rawLine).trim();
+    if (line === '') continue;
+
+    // [[array-of-tables]]
+    const aotMatch = line.match(/^\[\[(\w+)\]\]$/);
+    if (aotMatch) {
+      flushItem();
+      const key = aotMatch[1];
+      section = ['features', 'equipment', 'spells'].includes(key) ? key : null;
+      if (section) currentItem = {};
+      continue;
+    }
+
+    // [table]
+    const tableMatch = line.match(/^\[(\w+)\]$/);
+    if (tableMatch) {
+      flushItem();
+      section = tableMatch[1]; // 'skills', 'currency', or unknown
+      currentItem = null;
+      continue;
+    }
+
+    // key = value — support both bare keys and "quoted keys"
+    const eqIdx = line.indexOf('=');
+    if (eqIdx === -1) continue;
+
+    const rawKey = line.slice(0, eqIdx).trim();
+    const rawVal = line.slice(eqIdx + 1).trim();
+    // Strip quotes from quoted keys like "Animal Handling"
+    const key = rawKey.startsWith('"') && rawKey.endsWith('"')
+      ? rawKey.slice(1, -1)
+      : rawKey;
+
+    let value;
+    try { value = parseValue(rawVal); }
+    catch (_) { continue; }
+
+    if (section === null) {
+      // Top-level scalars
+      const intFields = ['level', 'HP', 'AC', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
+      if (intFields.includes(key)) {
+        c[key] = typeof value === 'number' ? value : parseInt(value) || 0;
+      } else if (typeof c[key] !== 'undefined' || ['name','class','species','background'].includes(key)) {
+        c[key] = value;
+      }
+    } else if (section === 'skills') {
+      if (typeof value === 'boolean') skillMap[key] = value;
+    } else if (section === 'currency') {
+      if (['CP', 'SP', 'EP', 'GP', 'PP'].includes(key) && typeof value === 'number') {
+        c.currency[key] = value;
+      }
+    } else if (currentItem !== null) {
+      currentItem[key] = value;
+    }
+  }
+
+  flushItem();
+
+  // Reconstruct ordered skills boolean array from named keys
+  c.skills = SKILL_ABILITIES.map(s => skillMap[s.name] === true);
+
+  return c;
+}
+
+function exportCharacter(id) {
+  const c = characters.find(x => x._id === id);
+  if (!c) return;
+  const toml = serializeCharToTOML(c);
+  const blob = new Blob([toml], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (c.name || 'character').replace(/[^a-z0-9]/gi, '_') + '.toml';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function importCharacterFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+  const text = await file.text();
+  let c;
+  try {
+    c = parseCharFromTOML(text);
+  } catch (e) {
+    alert('Failed to parse TOML: ' + e.message);
+    return;
+  }
+  const res = await fetch('/api/characters', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(c)
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    alert('Import failed: ' + (data.error || 'Unknown error'));
+    return;
+  }
+  loadCharacters();
 }
