@@ -698,12 +698,20 @@ async function openCharModal(id) {
     document.getElementById('char-modal-title').textContent = 'New Character';
   }
   modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  const scrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.width = '100%';
+  document.body.dataset.modalScrollY = scrollY;
 }
 
 function closeCharModal() {
   document.getElementById('char-modal').classList.remove('active');
-  document.body.style.overflow = '';
+  const scrollY = parseInt(document.body.dataset.modalScrollY || '0');
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  window.scrollTo(0, scrollY);
 }
 
 async function saveCharacter(e) {

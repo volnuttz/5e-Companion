@@ -1087,12 +1087,17 @@ h1.char-title {
   /* Modals: full-screen on phone */
   .modal-overlay {
     padding: 0 !important;
-    align-items: stretch !important;
+    align-items: flex-start !important;
+    overflow: hidden !important;
   }
   .modal {
     border-radius: 0 !important;
     max-width: 100% !important;
-    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100vh; /* fallback for browsers without svh */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
   /* Character list items: stack vertically */
