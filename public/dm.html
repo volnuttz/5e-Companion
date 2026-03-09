@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="container">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;">
       <h1 style="margin-bottom:0;">5e Companion</h1>
       <div style="display:flex;align-items:center;gap:12px;">
         <span id="dm-name" style="color:var(--text-muted);font-size:0.9rem;"></span>
@@ -22,7 +22,7 @@
       <div>
         <span id="session-status">No active session</span>
       </div>
-      <div style="display:flex;gap:8px;">
+      <div class="header-row" style="display:flex;gap:8px;">
         <button class="btn btn-primary" id="btn-new-session">New Session</button>
         <button class="btn btn-secondary" id="btn-show-qr" style="display:none;">Show QR</button>
         <button class="btn btn-danger btn-small" id="btn-end-session" style="display:none;">End Session</button>
@@ -57,7 +57,7 @@
     <!-- Characters Tab -->
     <div class="tab-content active" id="dm-tab-characters">
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <h2 style="margin:0;">Characters</h2>
           <div style="display:flex;gap:6px;">
             <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
@@ -73,7 +73,7 @@
     <div class="tab-content" id="dm-tab-battlefield">
       <div class="card">
         <h2 style="margin-bottom:12px;">Add Monsters</h2>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
           <input type="text" id="monster-search" placeholder="Search monsters..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
           <select id="monster-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Types</option>
@@ -86,7 +86,7 @@
       </div>
 
       <div class="card" style="margin-top:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <h2 style="margin:0;">Battlefield</h2>
           <button class="btn btn-danger btn-small" id="btn-clear-battlefield">Clear All</button>
         </div>
@@ -99,7 +99,7 @@
     <div class="tab-content" id="dm-tab-treasures">
       <div class="card">
         <h2 style="margin-bottom:12px;">Add Items</h2>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
           <input type="text" id="treasure-search" placeholder="Search equipment..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
           <select id="treasure-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Types</option>
@@ -112,7 +112,7 @@
       </div>
 
       <div class="card" style="margin-top:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <h2 style="margin:0;">Treasure Pool</h2>
           <button class="btn btn-danger btn-small" id="btn-clear-treasures">Clear All</button>
         </div>
@@ -124,7 +124,7 @@
     <!-- Shops Tab -->
     <div class="tab-content" id="dm-tab-shops">
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <h2 style="margin:0;">Shops</h2>
           <div style="display:flex;gap:8px;align-items:center;">
             <input type="text" id="new-shop-name" placeholder="Shop name..." style="padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
@@ -139,7 +139,7 @@
     <!-- Notes Tab -->
     <div class="tab-content" id="dm-tab-notes">
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <h2 style="margin:0;">Notes</h2>
           <div style="display:flex;gap:8px;align-items:center;">
             <span id="notes-save-status" style="font-size:0.8rem;color:var(--text-muted);"></span>
@@ -153,7 +153,7 @@
     <div class="tab-content" id="dm-tab-compendium">
       <div class="card">
         <h2 style="margin-bottom:12px;">Compendium</h2>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
           <input type="text" id="compendium-search" placeholder="Search spells, monsters, equipment, features..."
             style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
           <select id="compendium-category"
@@ -165,7 +165,7 @@
             <option value="feature">Features</option>
           </select>
         </div>
-        <div id="compendium-spell-filters" style="display:none;gap:8px;margin-bottom:10px;">
+        <div id="compendium-spell-filters" class="search-bar" style="display:none;gap:8px;margin-bottom:10px;">
           <select id="compendium-spell-level"
             style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Levels</option>
@@ -183,7 +183,7 @@
             <option value="warlock">Warlock</option><option value="wizard">Wizard</option>
           </select>
         </div>
-        <div id="compendium-monster-filters" style="display:none;gap:8px;margin-bottom:10px;">
+        <div id="compendium-monster-filters" class="search-bar" style="display:none;gap:8px;margin-bottom:10px;">
           <select id="compendium-monster-type"
             style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Types</option>
@@ -193,7 +193,7 @@
             <option value="">All CR</option>
           </select>
         </div>
-        <div id="compendium-feature-filters" style="display:none;gap:8px;margin-bottom:10px;">
+        <div id="compendium-feature-filters" class="search-bar" style="display:none;gap:8px;margin-bottom:10px;">
           <select id="compendium-feature-source"
             style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Sources</option>
@@ -288,7 +288,7 @@
 
         <!-- Features -->
         <h3>Features</h3>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
           <input type="text" id="feature-search" placeholder="Search features..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
           <select id="feature-source-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Sources</option>
@@ -303,7 +303,7 @@
 
         <!-- Equipment -->
         <h3>Equipment</h3>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
           <input type="text" id="equip-search" placeholder="Search items..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
           <select id="equip-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Types</option>
@@ -319,7 +319,7 @@
 
         <!-- Spells -->
         <h3>Spells</h3>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
           <input type="text" id="spell-search" placeholder="Search spells..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
           <select id="spell-level-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Levels</option>
@@ -351,7 +351,7 @@
         </div>
         <br>
 
-        <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <div class="header-row" style="display:flex;gap:8px;justify-content:flex-end;">
           <button type="button" class="btn btn-secondary" onclick="closeCharModal()">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Character</button>
         </div>

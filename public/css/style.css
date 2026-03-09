@@ -923,6 +923,73 @@ h1.char-title {
 }
 
 /* ── Responsive ── */
+@media (max-width: 768px) {
+  /* Tabs: horizontal scroll */
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 12px 14px;
+    min-height: 44px;
+  }
+
+  /* Search bars: wrap inputs full width, selects to second row */
+  .search-bar {
+    flex-wrap: wrap !important;
+  }
+  .search-bar input[type="text"] {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+  .search-bar select {
+    flex: 1 1 auto !important;
+  }
+
+  /* Touch targets: 44px minimum */
+  .hp-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+  }
+  .hp-btn-sm {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  .btn-small {
+    padding: 10px 14px;
+  }
+  .remove-item {
+    padding: 10px;
+    font-size: 1.4rem;
+  }
+  .slot-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Combat stats: wrap on tablet */
+  .combat-stats {
+    flex-wrap: wrap;
+  }
+  .combat-stat {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 120px;
+  }
+
+  /* Intermediate grid columns */
+  #saving-throws-inputs {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 10px;
@@ -1000,5 +1067,54 @@ h1.char-title {
   }
   .currency-row .form-group {
     min-width: 50px;
+  }
+
+  /* Form grid overrides for inline-styled elements */
+  #saving-throws-inputs {
+    grid-template-columns: 1fr !important;
+  }
+  #skills-inputs {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Header rows: wrap on mobile */
+  .header-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Modals: full-screen on phone */
+  .modal-overlay {
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+  .modal {
+    border-radius: 0 !important;
+    max-width: 100% !important;
+    min-height: 100vh;
+  }
+
+  /* Character list items: stack vertically */
+  .char-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .char-item-actions {
+    justify-content: flex-end;
+  }
+
+  /* Notes textarea height */
+  #notes-editor {
+    min-height: 300px !important;
+  }
+
+  /* Item action rows in treasure/shops */
+  .item-actions {
+    width: 100%;
+  }
+  .item-actions select {
+    flex: 1;
+    min-width: 0;
   }
 }

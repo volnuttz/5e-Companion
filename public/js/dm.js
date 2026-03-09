@@ -602,7 +602,7 @@ function renderCharacterList(chars) {
         <span class="char-name">${esc(c.name)}</span>
         <span class="char-meta">Level ${c.level} ${esc(c.species || '')} ${esc(c.class)} — HP ${c.HP} / AC ${c.AC}</span>
       </div>
-      <div style="display:flex;gap:6px;">
+      <div class="char-item-actions" style="display:flex;gap:6px;">
         <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();openCharModal('${c._id}')">Edit</button>
         <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();exportCharacter('${c._id}')">Export</button>
         <button class="btn btn-danger btn-small" onclick="event.stopPropagation();deleteCharacter('${c._id}')">Delete</button>
@@ -1728,7 +1728,7 @@ function renderTreasures() {
           <span style="color:var(--text-muted);font-size:0.8rem;margin-left:6px;">${esc(item.type || '')}</span>
           <div style="font-size:0.85rem;color:var(--text-muted);margin-top:2px;">${esc(item.description || '')}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;">
+        <div class="item-actions" style="display:flex;align-items:center;gap:6px;">
           <select id="treasure-assign-${idx}" style="padding:4px 8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:0.85rem;">
             <option value="">Assign to...</option>
             ${charOptions}
@@ -1972,7 +1972,7 @@ function renderShops() {
               ${['CP','SP','EP','GP','PP'].map(d => `<option value="${d}" ${item.denomination === d ? 'selected' : ''}>${d}</option>`).join('')}
             </select>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;">
+          <div class="item-actions" style="display:flex;align-items:center;gap:6px;">
             <select id="shop-sell-${si}-${ii}" style="padding:4px 8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:0.85rem;">
               <option value="">Sell to...</option>
               ${charOptions}
@@ -1985,11 +1985,11 @@ function renderShops() {
 
     return `
       <div class="card" style="margin-top:12px;border-left:3px solid var(--gold);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <h3 style="margin:0;">${esc(shop.name)}</h3>
           <button class="btn btn-danger btn-small" onclick="deleteShop(${si})">Delete Shop</button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
           <input type="text" id="shop-search-${si}" placeholder="Search equipment..." oninput="filterShopItems(${si})" style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
           <select id="shop-type-${si}" onchange="filterShopItems(${si})" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <option value="">All Types</option>
