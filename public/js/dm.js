@@ -1048,9 +1048,9 @@ function renderBattlefield() {
 
   container.innerHTML = battlefieldMonsters.map(m => {
     const hpPercent = Math.max(0, (m.currentHP / m.HP) * 100);
-    let hpColor = 'var(--gold)';
-    if (hpPercent <= 25) hpColor = '#c0392b';
-    else if (hpPercent <= 50) hpColor = '#e67e22';
+    let hpColor = 'var(--hp-high)';
+    if (hpPercent <= 25) hpColor = 'var(--hp-low)';
+    else if (hpPercent <= 50) hpColor = 'var(--hp-mid)';
     return `
       <div class="bf-card" data-uid="${m._uid}">
         <div class="bf-header">

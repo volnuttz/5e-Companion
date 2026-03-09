@@ -19,11 +19,12 @@
   </style>
 </head>
 <body>
-  <div class="container auth-container">
+  <div class="auth-overlay"></div>
+  <div class="container auth-container" style="position:relative;z-index:1;">
     <h1>5e Companion</h1>
     <p style="text-align:center;color:var(--text-muted);margin-top:-16px;margin-bottom:16px;">Dungeon Master Login</p>
 
-    <div class="card" style="border-radius:10px;">
+    <div class="card" style="border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
       <div class="auth-error" id="auth-error"></div>
       <form id="auth-form">
         <div class="form-group">
