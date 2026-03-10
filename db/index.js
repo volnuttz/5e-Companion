@@ -1,14 +1,58 @@
-const { Pool } = require('pg');
+const Database = require('better-sqlite3');
+const path = require('path');
 
-const pool = process.env.DATABASE_URL
-  ? new Pool({ connectionString: process.env.DATABASE_URL })
-  : new Pool({ database: 'dnd', host: 'localhost', port: 5432 });
+const db = new Database(path.join(__dirname, '..', 'dnd.db'));
 
-pool.on('error', (err) => {
-  console.error('Database pool error:', err.message);
-});
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-  pool
-};
+// Initialize schema
+db.exec(`
+  CREATE TABLE IF NOT EXISTS dm (
+    id INTEGER PRIMARY KEY,
+    battlefield TEXT NOT NULL DEFAULT '[]',
+    treasures TEXT NOT NULL DEFAULT '[]',
+    shops TEXT NOT NULL DEFAULT '[]',
+    notes TEXT NOT NULL DEFAULT '',
+    character_hp TEXT NOT NULL DEFAULT '{}'
+  );
+
+  CREATE TABLE IF NOT EXISTS characters (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    class TEXT NOT NULL DEFAULT '',
+    species TEXT NOT NULL DEFAULT '',
+    level INTEGER NOT NULL DEFAULT 1,
+    background TEXT NOT NULL DEFAULT '',
+    hp INTEGER NOT NULL DEFAULT 10,
+    ac INTEGER NOT NULL DEFAULT 10,
+    str INTEGER NOT NULL DEFAULT 10,
+    dex INTEGER NOT NULL DEFAULT 10,
+    con INTEGER NOT NULL DEFAULT 10,
+    int INTEGER NOT NULL DEFAULT 10,
+    wis INTEGER NOT NULL DEFAULT 10,
+    cha INTEGER NOT NULL DEFAULT 10,
+    skills TEXT NOT NULL DEFAULT '[]',
+    features TEXT NOT NULL DEFAULT '[]',
+    currency TEXT NOT NULL DEFAULT '{"CP":0,"SP":0,"EP":0,"GP":0,"PP":0}',
+    equipment TEXT NOT NULL DEFAULT '[]',
+    spells TEXT NOT NULL DEFAULT '[]',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS session (
+    id INTEGER PRIMARY KEY,
+    pin TEXT NOT NULL,
+    characters TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
+// Ensure the single DM row exists
+const dmRow = db.prepare('SELECT id FROM dm WHERE id = 1').get();
+if (!dmRow) {
+  db.prepare('INSERT INTO dm (id) VALUES (1)').run();
+}
+
+module.exports = db;

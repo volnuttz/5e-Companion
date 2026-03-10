@@ -47,26 +47,12 @@ let shops = []; // [{ id, name, items: [{ name, type, description, price, denomi
 let characterHPState = {}; // { charId: { currentHP, tempHP } }
 let bfCharactersCache = []; // cached character data for battlefield rendering
 
-function getToken() {
-  return localStorage.getItem('dmToken');
-}
-
 function authHeaders() {
-  return {
-    'Content-Type': 'application/json',
-    'X-DM-Token': getToken()
-  };
+  return { 'Content-Type': 'application/json' };
 }
 
 // --- Init ---
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!getToken()) {
-    window.location.href = '/dm/login';
-    return;
-  }
-
-  document.getElementById('dm-name').textContent = localStorage.getItem('dmUsername') || '';
-
   populateDropdowns();
   renderSavingThrows();
   renderSkillInputs();
@@ -84,8 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-end-session').addEventListener('click', endSession);
   document.getElementById('btn-add-char').addEventListener('click', () => openCharModal());
   document.getElementById('char-form').addEventListener('submit', saveCharacter);
-  document.getElementById('btn-logout').addEventListener('click', logout);
-
   // Recalculate skills and saving throws when abilities or level change
   ['STR','DEX','CON','INT','WIS','CHA'].forEach(a => {
     document.getElementById(`f-${a}`).addEventListener('input', () => {
@@ -165,12 +149,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     notesSaveTimeout = setTimeout(saveNotes, 1000);
   });
 });
-
-function logout() {
-  localStorage.removeItem('dmToken');
-  localStorage.removeItem('dmUsername');
-  window.location.href = '/dm/login';
-}
 
 // --- Dropdowns ---
 function populateDropdowns() {
@@ -588,7 +566,7 @@ function updateSkillModifiers() {
 // --- Characters ---
 async function loadCharacters() {
   const res = await fetch('/api/characters', { headers: authHeaders() });
-  if (res.status === 401) return logout();
+  if (!res.ok) return;
   const chars = await res.json();
   allCharacters = chars;
   renderCharacterList(chars);

@@ -1,47 +1,41 @@
-CREATE TABLE IF NOT EXISTS dms (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  battlefield JSONB DEFAULT '[]',
-  treasures JSONB DEFAULT '[]',
-  shops JSONB DEFAULT '[]',
-  notes TEXT DEFAULT '',
-  character_hp JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+-- SQLite schema (reference only — schema is auto-initialized in db/index.js)
+
+CREATE TABLE IF NOT EXISTS dm (
+  id INTEGER PRIMARY KEY,
+  battlefield TEXT NOT NULL DEFAULT '[]',
+  treasures TEXT NOT NULL DEFAULT '[]',
+  shops TEXT NOT NULL DEFAULT '[]',
+  notes TEXT NOT NULL DEFAULT '',
+  character_hp TEXT NOT NULL DEFAULT '{}'
 );
 
 CREATE TABLE IF NOT EXISTS characters (
-  id UUID PRIMARY KEY,
-  dm_id INTEGER NOT NULL REFERENCES dms(id) ON DELETE CASCADE,
-  name VARCHAR(100) NOT NULL,
-  class VARCHAR(50),
-  species VARCHAR(50),
-  level INTEGER DEFAULT 1,
-  background VARCHAR(100),
-  hp INTEGER DEFAULT 10,
-  ac INTEGER DEFAULT 10,
-  str INTEGER DEFAULT 10,
-  dex INTEGER DEFAULT 10,
-  con INTEGER DEFAULT 10,
-  int INTEGER DEFAULT 10,
-  wis INTEGER DEFAULT 10,
-  cha INTEGER DEFAULT 10,
-  skills JSONB DEFAULT '[]',
-  features JSONB DEFAULT '[]',
-  currency JSONB DEFAULT '{"CP":0,"SP":0,"EP":0,"GP":0,"PP":0}',
-  equipment JSONB DEFAULT '[]',
-  spells JSONB DEFAULT '[]',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  class TEXT NOT NULL DEFAULT '',
+  species TEXT NOT NULL DEFAULT '',
+  level INTEGER NOT NULL DEFAULT 1,
+  background TEXT NOT NULL DEFAULT '',
+  hp INTEGER NOT NULL DEFAULT 10,
+  ac INTEGER NOT NULL DEFAULT 10,
+  str INTEGER NOT NULL DEFAULT 10,
+  dex INTEGER NOT NULL DEFAULT 10,
+  con INTEGER NOT NULL DEFAULT 10,
+  int INTEGER NOT NULL DEFAULT 10,
+  wis INTEGER NOT NULL DEFAULT 10,
+  cha INTEGER NOT NULL DEFAULT 10,
+  skills TEXT NOT NULL DEFAULT '[]',
+  features TEXT NOT NULL DEFAULT '[]',
+  currency TEXT NOT NULL DEFAULT '{"CP":0,"SP":0,"EP":0,"GP":0,"PP":0}',
+  equipment TEXT NOT NULL DEFAULT '[]',
+  spells TEXT NOT NULL DEFAULT '[]',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
-CREATE TABLE IF NOT EXISTS sessions (
-  id SERIAL PRIMARY KEY,
-  dm_id INTEGER UNIQUE NOT NULL REFERENCES dms(id) ON DELETE CASCADE,
-  pin VARCHAR(20) NOT NULL,
-  characters JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE IF NOT EXISTS session (
+  id INTEGER PRIMARY KEY,
+  pin TEXT NOT NULL,
+  characters TEXT NOT NULL DEFAULT '{}',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
-
-CREATE INDEX IF NOT EXISTS idx_characters_dm_id ON characters(dm_id);
-CREATE INDEX IF NOT EXISTS idx_sessions_dm_id ON sessions(dm_id);
