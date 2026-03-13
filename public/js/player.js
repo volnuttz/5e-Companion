@@ -45,11 +45,46 @@ let playerPeer = null;
 let currentCharacter = null; // cached character data from DM
 let currentHPState = null;   // cached HP state from DM
 let joinTimeout = null;
+let _isRejoining = false;    // true when auto-reconnecting with saved session
 
 // Player-local session state (preserved across DM updates)
 let playerState = {
   slotChecks: {}   // { "1-0": true, "2-1": false, ... }
 };
+
+// --- Session persistence helpers ---
+const SESSION_KEY = 'dnd-session-' + roomId;
+
+function saveSession(pin, characterId) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ pin, characterId }));
+  } catch (e) {}
+}
+
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+}
+
+// --- Disconnect banner helpers ---
+function showBanner(text, isError = false) {
+  const banner = document.getElementById('disconnect-banner');
+  if (!banner) return;
+  banner.textContent = text;
+  banner.style.background = isError ? 'var(--accent)' : '#555';
+  banner.style.display = 'block';
+}
+
+function hideBanner() {
+  const banner = document.getElementById('disconnect-banner');
+  if (banner) banner.style.display = 'none';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-join').addEventListener('click', joinSession);
@@ -66,7 +101,42 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById(tab.dataset.tab).classList.add('active');
     });
   });
+
+  // Auto-rejoin if we have a saved session for this room
+  const saved = loadSession();
+  if (saved && saved.pin) {
+    document.getElementById('player-pin').value = saved.pin;
+    _isRejoining = true;
+    sessionPin = saved.pin;
+    activeCharacterId = saved.characterId || null;
+    // Attempt silent reconnect after a short delay so the page finishes loading
+    setTimeout(autoRejoin, 500);
+  }
+
+  // Re-attempt connection when the user returns to the tab (handles mobile backgrounding)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && playerPeer && !playerPeer.isConnected() && sessionPin) {
+      playerPeer.reconnectNow();
+    }
+  });
+
+  // Re-attempt connection when the network comes back online
+  window.addEventListener('online', () => {
+    if (playerPeer && !playerPeer.isConnected() && sessionPin) {
+      playerPeer.reconnectNow();
+    }
+  });
 });
+
+async function autoRejoin() {
+  try {
+    await _initPlayerPeer();
+  } catch (err) {
+    console.error('[Player] Auto-rejoin failed:', err);
+    _isRejoining = false;
+    showBanner('Could not reconnect. Enter your PIN to rejoin.', true);
+  }
+}
 
 async function joinSession() {
   sessionPin = document.getElementById('player-pin').value.trim();
@@ -75,34 +145,75 @@ async function joinSession() {
 
   if (!sessionPin) { errorEl.textContent = 'Please enter the PIN'; errorEl.style.display = 'block'; return; }
 
-  // Connect to DM via PeerJS
+  _isRejoining = false;
+  activeCharacterId = null;
+
   try {
-    playerPeer = peerManager.createPlayerPeer(roomId);
-
-    // Set up message handler before connecting
-    playerPeer.onMessage(handleDMMessage);
-    playerPeer.onDisconnect(handleDisconnect);
-
-    await playerPeer.connect();
+    await _initPlayerPeer();
   } catch (err) {
     console.error('[Player] Connection failed:', err);
     errorEl.textContent = 'Could not connect to DM. Make sure the session is active.';
     errorEl.style.display = 'block';
-    return;
+  }
+}
+
+async function _initPlayerPeer() {
+  // Tear down any previous peer cleanly
+  if (playerPeer) {
+    playerPeer.cancelReconnect();
+    playerPeer.destroy();
+    playerPeer = null;
   }
 
-  // Send join request with PIN
-  playerPeer.sendToDM({ type: 'join', pin: sessionPin });
+  playerPeer = peerManager.createPlayerPeer(roomId);
 
-  // Show loading state with timeout
+  playerPeer.onMessage(handleDMMessage);
+  playerPeer.onDisconnect(handleDisconnect);
+  playerPeer.onReconnecting(handleReconnecting);
+  playerPeer.onConnect(handleConnected);
+
+  // Show loading state
   document.getElementById('btn-join').disabled = true;
   document.getElementById('btn-join').textContent = 'Connecting...';
+
+  await playerPeer.connect();
+
+  // Connected — send join request
+  playerPeer.sendToDM({ type: 'join', pin: sessionPin });
+
+  // Timeout if DM never responds
   joinTimeout = setTimeout(() => {
     document.getElementById('btn-join').disabled = false;
     document.getElementById('btn-join').textContent = 'Join';
+    const errorEl = document.getElementById('join-error');
     errorEl.textContent = 'No response from DM. Check the PIN and try again.';
     errorEl.style.display = 'block';
+    clearSession();
   }, 8000);
+}
+
+// Called every time the WebRTC connection to DM opens (initial connect AND after auto-reconnect)
+function handleConnected() {
+  hideBanner();
+  document.getElementById('btn-join').disabled = false;
+  document.getElementById('btn-join').textContent = 'Join';
+
+  if (sessionPin && _isRejoining) {
+    // Auto-rejoin: send join, then claim will happen in handleDMMessage → join-ok
+    playerPeer.sendToDM({ type: 'join', pin: sessionPin });
+    joinTimeout = setTimeout(() => {
+      showBanner('Could not reconnect — DM may have ended the session.', true);
+    }, 8000);
+  }
+}
+
+function handleDisconnect() {
+  showBanner('Connection lost. Reconnecting...', false);
+}
+
+function handleReconnecting(attempt, delay) {
+  const secs = Math.round(delay / 1000);
+  showBanner(`Reconnecting… (attempt ${attempt}, retrying in ${secs}s)`, false);
 }
 
 function handleDMMessage(msg) {
@@ -111,29 +222,59 @@ function handleDMMessage(msg) {
       clearTimeout(joinTimeout);
       document.getElementById('btn-join').disabled = false;
       document.getElementById('btn-join').textContent = 'Join';
-      document.getElementById('step-join').style.display = 'none';
-      document.getElementById('step-pick').style.display = '';
-      renderCharacterPicker(msg.characters);
+
+      if (_isRejoining && activeCharacterId) {
+        // Silently reclaim the same character — no need to show the picker
+        playerPeer.sendToDM({ type: 'claim', characterId: activeCharacterId, playerName: 'player-' + Date.now() });
+      } else {
+        document.getElementById('step-join').style.display = 'none';
+        document.getElementById('step-pick').style.display = '';
+        renderCharacterPicker(msg.characters);
+      }
       break;
 
     case 'join-error':
       clearTimeout(joinTimeout);
       document.getElementById('btn-join').disabled = false;
       document.getElementById('btn-join').textContent = 'Join';
-      const errorEl = document.getElementById('join-error');
-      errorEl.textContent = msg.error;
-      errorEl.style.display = 'block';
+      clearSession();
+      if (_isRejoining) {
+        // Was trying to silently rejoin but PIN is now wrong (DM changed session)
+        _isRejoining = false;
+        showBanner('Session ended or PIN changed. Re-enter PIN to rejoin.', true);
+        document.getElementById('step-join').style.display = '';
+        document.getElementById('step-pick').style.display = 'none';
+        document.getElementById('step-sheet').style.display = 'none';
+      } else {
+        _isRejoining = false;
+        const errorEl = document.getElementById('join-error');
+        errorEl.textContent = msg.error;
+        errorEl.style.display = 'block';
+      }
       break;
 
     case 'claim-ok':
+      clearTimeout(joinTimeout);
       activeCharacterId = msg.characterId;
       currentCharacter = msg.character;
       currentHPState = msg.hpState;
+      _isRejoining = false;
+      saveSession(sessionPin, activeCharacterId);
+      hideBanner();
       renderCharacterSheet(currentCharacter, currentHPState);
       break;
 
     case 'claim-error':
-      dialogAlert(msg.error || 'Could not select character', 'Error', 'error');
+      if (_isRejoining) {
+        // Character may still be in a grace period or genuinely gone; fall back to picker
+        _isRejoining = false;
+        activeCharacterId = null;
+        clearSession();
+        showBanner('Could not reclaim character automatically. Please select again.', true);
+        playerPeer.sendToDM({ type: 'join', pin: sessionPin });
+      } else {
+        dialogAlert(msg.error || 'Could not select character', 'Error', 'error');
+      }
       break;
 
     case 'character-update':
@@ -150,13 +291,10 @@ function handleDMMessage(msg) {
         renderCharacterPicker(msg.characters);
       }
       break;
-  }
-}
 
-function handleDisconnect() {
-  const banner = document.getElementById('disconnect-banner');
-  if (banner) {
-    banner.style.display = 'block';
+    case 'pong':
+      // Heartbeat response — connection is confirmed alive, nothing else needed
+      break;
   }
 }
 
