@@ -389,8 +389,8 @@ function renderCharacterSheet(c, hpState) {
     return `
       <div class="stat-box">
         <div class="stat-label">${a}</div>
-        <div class="stat-value">${score}</div>
         <div class="stat-mod">${modStr}</div>
+        <div class="stat-value">${score}</div>
       </div>
     `;
   }).join('');

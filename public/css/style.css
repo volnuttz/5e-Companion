@@ -477,13 +477,13 @@ th {
 }
 
 .stat-value {
-  font-size: 1.4rem;
-  font-weight: bold;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .stat-mod {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 1.4rem;
+  font-weight: bold;
 }
 
 /* ── Skills list ── */

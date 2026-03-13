@@ -1273,8 +1273,8 @@ function buildMonsterStatBlockHTML(m) {
       ${['STR','DEX','CON','INT','WIS','CHA'].map(a => `
         <div class="stat-box" style="min-width:55px;">
           <div class="stat-label">${a}</div>
-          <div class="stat-value" style="font-size:1.1rem;">${m[a] || 10}</div>
-          <div class="stat-mod">${abilityMod(m[a] || 10)}</div>
+          <div class="stat-mod" style="font-size:1.1rem;">${abilityMod(m[a] || 10)}</div>
+          <div class="stat-value" style="font-size:0.85rem;">${m[a] || 10}</div>
         </div>
       `).join('')}
     </div>
