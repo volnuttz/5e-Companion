@@ -844,6 +844,10 @@ th {
   max-width: 700px;
   box-shadow: var(--shadow-lift);
   animation: modalIn 0.15s ease-out;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Modal entrance animation */
@@ -885,6 +889,14 @@ th {
 
 .modal-close:hover {
   color: var(--accent);
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* ── Dialog modal (replaces alert/confirm) ── */
@@ -1233,13 +1245,11 @@ h1.char-title {
   .modal {
     border-radius: 0 !important;
     max-width: 100% !important;
-    /* Use explicit height so iOS Safari recognises a fixed scroll boundary.
-       min-height does not create a scroll container on iOS Safari. */
+    max-height: none !important;
+    /* Use explicit height so iOS Safari recognises a fixed scroll boundary. */
     height: 100vh; /* fallback */
     height: 100dvh; /* dynamic viewport — accounts for iOS address bar */
-    overflow-y: scroll; /* scroll (not auto) forces scrollability on iOS Safari */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    overflow: hidden; /* modal-body handles scrolling */
   }
 
   /* Character list items: stack vertically */
