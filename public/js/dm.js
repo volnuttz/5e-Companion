@@ -23,6 +23,16 @@ function calcProfBonus(level) {
   return Math.ceil(level / 4) + 1;
 }
 
+function getProficiencyBonus() {
+  const level = parseInt(document.getElementById('f-level')?.value) || 1;
+  return calcProfBonus(level);
+}
+
+function getAbilityMod(ability) {
+  const score = parseInt(document.getElementById(`f-${ability}`)?.value) || 10;
+  return Math.floor((score - 10) / 2);
+}
+
 let currentSession = null; // { pin, characters: { id: { claimedBy } } }
 let dmPeer = null; // PeerJS host instance
 let allSpells = [];
