@@ -235,13 +235,14 @@ function dialogPrompt(message, title, defaultValue) {
     msgEl.textContent = message || '';
 
     btnsEl.innerHTML = `
-      <input type="text" id="dialog-prompt-input" value="${esc(defaultValue || '')}"
-        style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;font-family:var(--font-body);font-size:1rem;">
-    `;
-    const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;gap:10px;justify-content:center;margin-top:12px;';
-    wrapper.innerHTML = '<button class="btn btn-secondary btn-small">Cancel</button><button class="btn btn-primary btn-small">Save</button>';
-    btnsEl.appendChild(wrapper);
+      <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
+        <input type="text" id="dialog-prompt-input" value="${esc(defaultValue || '')}"
+          style="width:100%;box-sizing:border-box;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;font-family:var(--font-body);font-size:1rem;">
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="btn btn-secondary btn-small">Cancel</button><button class="btn btn-primary btn-small">Save</button>
+        </div>
+      </div>`;
+    const wrapper = btnsEl.querySelector('div > div');
 
     const input = document.getElementById('dialog-prompt-input');
     input.select();
