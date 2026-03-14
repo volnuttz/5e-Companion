@@ -61,19 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-add-char').addEventListener('click', () => openCharModal());
   document.getElementById('char-form').addEventListener('submit', saveCharacter);
 
-  // Workspace dropdown toggle
-  const workspaceToggle = document.getElementById('btn-workspace-menu');
-  const workspaceDropdown = document.getElementById('workspace-dropdown');
-  workspaceToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = workspaceDropdown.classList.toggle('open');
-    workspaceToggle.setAttribute('aria-expanded', isOpen);
-  });
-  document.addEventListener('click', () => {
-    workspaceDropdown.classList.remove('open');
-    workspaceToggle.setAttribute('aria-expanded', 'false');
-  });
-
   // Workspace
   document.getElementById('btn-save-workspace').addEventListener('click', saveWorkspace);
   document.getElementById('load-workspace-file').addEventListener('change', loadWorkspace);

@@ -12,14 +12,11 @@
       <h1 style="margin-bottom:0;">5.5e Companion</h1>
       <div style="display:flex;align-items:center;gap:12px;">
         <span id="peer-status" style="font-size:0.8rem;color:var(--text-muted);"></span>
-        <div class="workspace-menu">
-          <button class="btn btn-secondary btn-small workspace-menu-toggle" id="btn-workspace-menu" aria-label="Workspace actions" aria-expanded="false" aria-haspopup="true">&#8942;</button>
-          <div class="workspace-dropdown" id="workspace-dropdown" role="menu">
-            <button class="workspace-dropdown-item" id="btn-save-workspace" role="menuitem">Save Workspace</button>
-            <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
-            <button class="workspace-dropdown-item" role="menuitem" onclick="document.getElementById('load-workspace-file').click()">Load Workspace</button>
-            <button class="workspace-dropdown-item workspace-dropdown-item--danger" id="btn-clear-workspace" role="menuitem">Clear Workspace</button>
-          </div>
+        <div class="workspace-actions">
+          <button class="btn btn-secondary btn-small" id="btn-save-workspace" aria-label="Save Workspace">Save</button>
+          <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
+          <button class="btn btn-secondary btn-small" aria-label="Load Workspace" onclick="document.getElementById('load-workspace-file').click()">Load</button>
+          <button class="btn btn-danger btn-small" id="btn-clear-workspace" aria-label="Clear Workspace">Clear</button>
         </div>
       </div>
     </div>
