@@ -157,12 +157,106 @@ h3 {
   font-size: 0.85rem;
 }
 
-/* ── Workspace inline actions ── */
-.workspace-actions {
+/* ── Hamburger button ── */
+.hamburger-btn {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 32px;
+  height: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.hamburger-btn span {
+  display: block;
+  height: 3px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+.hamburger-btn:hover span {
+  background: var(--accent);
+}
+
+/* ── Sidebar overlay ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 900;
+}
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* ── Sidebar panel ── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 260px;
+  height: 100%;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-dark);
+  box-shadow: 4px 0 16px rgba(0,0,0,0.15);
+  z-index: 910;
+  transition: left 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.sidebar.open {
+  left: 0;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--gold);
+}
+.sidebar-close {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+  padding: 0 4px;
+}
+.sidebar-close:hover {
+  color: var(--accent);
+}
+.sidebar-section {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sidebar-section h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.sidebar-section h3::after {
+  display: none;
+}
+.sidebar-btn {
+  width: 100%;
+  text-align: left;
 }
 
 /* ── Cards ── */

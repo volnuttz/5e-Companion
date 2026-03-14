@@ -8,17 +8,29 @@
 </head>
 <body>
   <div class="container">
-    <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;">
-      <h1 style="margin-bottom:0;">5.5e Companion</h1>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span id="peer-status" style="font-size:0.8rem;color:var(--text-muted);"></span>
-        <div class="workspace-actions">
-          <button class="btn btn-secondary btn-small" id="btn-save-workspace" aria-label="Save Workspace">Save</button>
-          <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
-          <button class="btn btn-secondary btn-small" aria-label="Load Workspace" onclick="document.getElementById('load-workspace-file').click()">Load</button>
-          <button class="btn btn-danger btn-small" id="btn-clear-workspace" aria-label="Clear Workspace">Clear</button>
-        </div>
+    <!-- Sidebar overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar" aria-label="Menu">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Menu</span>
+        <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">&times;</button>
       </div>
+      <div class="sidebar-section">
+        <h3>Workspace</h3>
+        <button class="btn btn-secondary sidebar-btn" id="btn-save-workspace" aria-label="Save Workspace">Save Workspace</button>
+        <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
+        <button class="btn btn-secondary sidebar-btn" aria-label="Load Workspace" onclick="document.getElementById('load-workspace-file').click()">Load Workspace</button>
+        <button class="btn btn-danger sidebar-btn" id="btn-clear-workspace" aria-label="Clear Workspace">Clear Workspace</button>
+      </div>
+    </div>
+
+    <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;">
+      <button class="hamburger-btn" id="hamburger-btn" onclick="openSidebar()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <h1 style="margin-bottom:0;">5.5e Companion</h1>
+      <span id="peer-status" style="font-size:0.8rem;color:var(--text-muted);min-width:80px;text-align:right;"></span>
     </div>
     <br>
 
@@ -397,6 +409,16 @@
     </div>
   </div>
 
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('sidebar-overlay').classList.add('active');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebar-overlay').classList.remove('active');
+    }
+  </script>
   <script src="https://unpkg.com/peerjs@1/dist/peerjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
   <script src="/js/constants.js"></script>
