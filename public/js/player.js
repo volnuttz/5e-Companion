@@ -432,16 +432,26 @@ function renderCharacterSheet(c, hpState) {
 
   // --- Currency (read-only, managed by DM) ---
   const cur = c.currency || {};
-  const coins = ['CP','SP','EP','GP','PP'];
+  const coinDefs = [
+    { key: 'CP', cls: 'cp', name: 'Copper' },
+    { key: 'SP', cls: 'sp', name: 'Silver' },
+    { key: 'EP', cls: 'ep', name: 'Electrum' },
+    { key: 'GP', cls: 'gp', name: 'Gold' },
+    { key: 'PP', cls: 'pp', name: 'Platinum' },
+  ];
 
   const currencyHtml = `
+    <h3>Purse</h3>
     <div class="currency-tracker">
-      ${coins.map(k => `
-        <div class="coin-group">
-          <div class="coin-label">${k}</div>
-          <span class="coin-value">${cur[k] || 0}</span>
-        </div>
-      `).join('')}
+      ${coinDefs.map(({ key, cls, name }) => {
+        const amount = cur[key] || 0;
+        return `
+        <div class="coin-group${amount === 0 ? ' zero' : ''}">
+          <div class="coin-disc ${cls}">${key}</div>
+          <span class="coin-amount">${amount}</span>
+          <span class="coin-name">${name}</span>
+        </div>`;
+      }).join('')}
     </div>
   `;
 
@@ -456,7 +466,7 @@ function renderCharacterSheet(c, hpState) {
       </div>
     `).join('');
 
-  document.getElementById('equipment-display').innerHTML = currencyHtml + '<h3 style="margin-top:16px;">Equipment</h3>' + equipHtml;
+  document.getElementById('equipment-display').innerHTML = currencyHtml + '<h3>Equipment</h3>' + equipHtml;
 
   // --- Spellcasting Info ---
   const spellcastingAbility = SPELLCASTING_ABILITY[c.class] || null;
