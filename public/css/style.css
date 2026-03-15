@@ -8,18 +8,20 @@
   --accent-hover: #a63c3c;
   --text: #2c2c2c;
   --text-muted: #6b6b6b;
-  --gold: #7a5c1f;
-  --gold-light: #b8922e;
+  --gold: #7e6020;
+  --gold-light: #c09a30;
   --border: #d5cfc0;
   --border-dark: #b8b0a0;
   --font-heading: 'Cinzel', serif;
   --font-body: 'Crimson Text', Georgia, serif;
-  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
-  --shadow-lift: 0 6px 20px rgba(0,0,0,0.15);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md: 0 3px 12px rgba(0,0,0,0.10);
+  --shadow-lift: 0 5px 18px rgba(0,0,0,0.13);
   --hp-high: #3a7d44;
   --hp-mid: #c08a1e;
   --hp-low: #c0392b;
+  --radius: 8px;
+  --transition: 0.18s ease;
 }
 
 * {
@@ -33,11 +35,11 @@ body {
   background: var(--bg-dark) url('/img/background_texture.png') repeat;
   color: var(--text);
   min-height: 100vh;
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 
 .container {
-  max-width: 960px;
+  max-width: 1024px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -79,7 +81,7 @@ h3 {
   margin: 16px 0;
   color: var(--gold);
   font-size: 0.85rem;
-  opacity: 0.6;
+  opacity: 0.45;
 }
 .section-divider::before,
 .section-divider::after {
@@ -89,39 +91,39 @@ h3 {
   background: linear-gradient(to right, transparent, var(--gold), transparent);
 }
 
-/* Auto-divider after h3 inside cards */
+/* Auto-divider after h3 inside cards — subtle underline */
 .card h3::after {
   content: '';
   display: block;
   height: 1px;
-  margin-top: 6px;
-  background: linear-gradient(to right, var(--gold-light), transparent);
-  opacity: 0.4;
+  margin-top: 5px;
+  background: var(--border);
+  opacity: 0.7;
 }
 
 /* ── Buttons ── */
 .btn {
-  padding: 10px 20px;
+  padding: 9px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
   font-family: var(--font-heading);
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+  transition: filter var(--transition), opacity var(--transition), box-shadow var(--transition);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.14);
   touch-action: manipulation;
 }
 
 .btn:hover {
-  box-shadow: 0 4px 10px rgba(0,0,0,0.22);
-  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .btn:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  opacity: 0.85;
+  box-shadow: none;
 }
 
 .btn-primary {
@@ -129,18 +131,14 @@ h3 {
   color: white;
 }
 
-.btn-primary:hover {
-  background: var(--accent-hover);
-}
-
 .btn-secondary {
-  background: var(--bg-input);
+  background: transparent;
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dark);
 }
 
 .btn-secondary:hover {
-  background: #e8e3d8;
+  background: rgba(0,0,0,0.04);
 }
 
 .btn-danger {
@@ -148,12 +146,8 @@ h3 {
   color: #fff;
 }
 
-.btn-danger:hover {
-  background: #e74c3c;
-}
-
 .btn-small {
-  padding: 6px 12px;
+  padding: 5px 12px;
   font-size: 0.85rem;
 }
 
@@ -263,21 +257,10 @@ h3 {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
+  border-radius: var(--radius);
+  padding: 24px;
   margin-bottom: 16px;
   box-shadow: var(--shadow-sm);
-  position: relative;
-}
-
-/* Double-line inner border effect on cards */
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border: 1px solid rgba(122, 92, 31, 0.15);
-  border-radius: 7px;
-  pointer-events: none;
 }
 
 /* ── Forms ── */
@@ -300,17 +283,17 @@ h3 {
   background: var(--bg-input);
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-size: 0.95rem;
   outline: none;
   font-family: var(--font-body);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--transition);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
   color: var(--gold);
-  opacity: 0.45;
+  opacity: 0.5;
   font-style: italic;
 }
 
@@ -318,7 +301,6 @@ h3 {
 .form-group select:focus,
 .form-group textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(139, 46, 46, 0.12);
 }
 
 .form-group textarea {
@@ -347,45 +329,43 @@ th, td {
 th {
   color: var(--gold);
   font-weight: 600;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.08);
+  background: rgba(126, 96, 32, 0.08);
 }
 
 /* ── Tabs ── */
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: 0;
   margin-bottom: 20px;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .tab {
-  padding: 8px 18px;
+  padding: 8px 16px;
   background: none;
   border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   color: var(--text-muted);
   cursor: pointer;
   font-family: var(--font-heading);
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  border-radius: 20px 20px 0 0;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: all 0.2s;
+  border-radius: 0;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
   touch-action: manipulation;
 }
 
 .tab:hover {
   color: var(--gold);
-  background: rgba(122, 92, 31, 0.07);
+  background: rgba(126, 96, 32, 0.06);
 }
 
 .tab.active {
-  background: var(--gold);
-  color: #fff;
-  border-bottom-color: var(--gold);
-  box-shadow: 0 -2px 6px rgba(122, 92, 31, 0.2);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: rgba(139, 46, 46, 0.05);
 }
 
 .tab-content {
@@ -453,7 +433,6 @@ th {
   border-color: var(--accent);
   border-left-color: var(--accent);
   box-shadow: var(--shadow-sm);
-  transform: translateX(2px);
 }
 
 .char-item.claimed {
@@ -492,17 +471,15 @@ th {
 .stat-box {
   background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 12px 8px;
   text-align: center;
-  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+  transition: border-color var(--transition);
   cursor: default;
 }
 
 .stat-box:hover {
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(122, 92, 31, 0.25);
-  transform: translateY(-2px);
 }
 
 .stat-label {
@@ -511,7 +488,6 @@ th {
   color: var(--gold);
   font-weight: 700;
   letter-spacing: 1px;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.08);
 }
 
 .stat-value {
@@ -549,7 +525,6 @@ th {
 .skill-mod {
   color: var(--gold);
   font-weight: 600;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.08);
 }
 
 /* ── Equipment & Spells ── */
@@ -569,7 +544,6 @@ th {
 .item-card h4 {
   color: var(--gold);
   margin-bottom: 4px;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.08);
 }
 
 .item-card .meta {
@@ -607,7 +581,6 @@ th {
 .bf-name {
   color: var(--gold);
   font-family: var(--font-heading);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.08);
 }
 
 .bf-name:hover {
@@ -623,17 +596,16 @@ th {
 
 .bf-hp-bar-container {
   flex: 1;
-  height: 14px;
+  height: 16px;
   background: var(--border);
-  border-radius: 7px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
 }
 
 .bf-hp-bar {
   height: 100%;
-  border-radius: 7px;
-  transition: width 0.35s ease, background-color 0.35s ease;
+  border-radius: 8px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background-color 0.4s cubic-bezier(0.4,0,0.2,1);
   background-color: var(--hp-high);
 }
 
@@ -875,7 +847,6 @@ th {
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--gold);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.08);
 }
 
 .coin-controls {
@@ -946,7 +917,9 @@ th {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 1000;
   justify-content: center;
   align-items: flex-start;
@@ -962,12 +935,12 @@ th {
 .modal {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 24px;
   width: 100%;
   max-width: 700px;
   box-shadow: var(--shadow-lift);
-  animation: modalIn 0.15s ease-out;
+  animation: modalIn 0.18s cubic-bezier(0.2, 0, 0, 1);
   max-height: calc(100vh - 80px);
   display: flex;
   flex-direction: column;
@@ -978,11 +951,11 @@ th {
 @keyframes modalIn {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(-8px);
+    transform: translateY(-10px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1028,7 +1001,9 @@ th {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 2000;
   justify-content: center;
   align-items: center;
@@ -1042,7 +1017,7 @@ th {
 .dialog {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 28px 32px;
   width: 100%;
   max-width: 420px;
@@ -1103,17 +1078,16 @@ h1.char-title {
 
 .combat-stat {
   background: var(--bg-input);
-  border: 2px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 16px 24px;
   text-align: center;
   flex: 1;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition: border-color var(--transition);
 }
 
 .combat-stat:hover {
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(122, 92, 31, 0.18);
 }
 
 .combat-stat .label {
@@ -1125,7 +1099,6 @@ h1.char-title {
   font-size: 2rem;
   font-weight: bold;
   color: var(--gold);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* ── Skill proficiency checkboxes ── */
