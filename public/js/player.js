@@ -57,7 +57,7 @@ const SESSION_KEY = 'dnd-session-' + roomId;
 
 function saveSession(pin, characterId) {
   try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ pin, characterId }));
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ pin, characterId, savedAt: Date.now() }));
   } catch (e) {}
 }
 
@@ -102,13 +102,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Auto-rejoin if we have a saved session for this room
+  // Auto-rejoin if we have a saved session for this room (within the last 8 hours)
+  const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000;
   const saved = loadSession();
-  if (saved && saved.pin) {
+  if (saved && saved.pin && saved.characterId && (Date.now() - (saved.savedAt || 0)) < SESSION_MAX_AGE_MS) {
     document.getElementById('player-pin').value = saved.pin;
     _isRejoining = true;
     sessionPin = saved.pin;
-    activeCharacterId = saved.characterId || null;
+    activeCharacterId = saved.characterId;
     // Attempt silent reconnect after a short delay so the page finishes loading
     setTimeout(autoRejoin, 500);
   }
@@ -242,6 +243,7 @@ function handleDMMessage(msg) {
         // Was trying to silently rejoin but PIN is now wrong (DM changed session)
         _isRejoining = false;
         showBanner('Session ended or PIN changed. Re-enter PIN to rejoin.', true);
+        document.getElementById('player-pin').value = '';
         document.getElementById('step-join').style.display = '';
         document.getElementById('step-pick').style.display = 'none';
         document.getElementById('step-sheet').style.display = 'none';
