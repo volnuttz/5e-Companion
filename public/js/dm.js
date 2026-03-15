@@ -958,9 +958,6 @@ async function createSession() {
   }
 }
 
-// Grace period (ms) before a disconnected player's character is unclaimed.
-// This covers brief drops from phone backgrounding or network hiccups.
-const CLAIM_GRACE_MS = 30000;
 
 function setupPeerHandlers() {
   dmPeer.onPlayerMessage(async (peerId, msg) => {
@@ -985,15 +982,9 @@ function setupPeerHandlers() {
         dmPeer.sendToPlayer(peerId, { type: 'claim-error', error: 'Character not in session' });
         return;
       }
-      // Allow claim if the character is unclaimed OR still within a reconnect grace period.
-      if (charEntry.claimedBy && !charEntry._graceTimer) {
+      if (charEntry.claimedBy) {
         dmPeer.sendToPlayer(peerId, { type: 'claim-error', error: 'Character already claimed' });
         return;
-      }
-      // Cancel any pending unclaim timer (player reconnected in time).
-      if (charEntry._graceTimer) {
-        clearTimeout(charEntry._graceTimer);
-        charEntry._graceTimer = null;
       }
       charEntry.claimedBy = playerName;
       dmPeer.setPlayerInfo(peerId, playerName, characterId);
@@ -1012,17 +1003,12 @@ function setupPeerHandlers() {
   });
 
   dmPeer.onPlayerDisconnect((peerId, info) => {
-    // Start a grace period before unclaiming — gives brief disconnects time to recover.
+    // Immediately unclaim the character so the player must rejoin with PIN.
     if (currentSession && info && info.characterId) {
       const entry = currentSession.characters[info.characterId];
       if (entry && entry.claimedBy) {
-        entry._graceTimer = setTimeout(() => {
-          entry.claimedBy = null;
-          entry._graceTimer = null;
-          renderBattlefieldCharacters();
-          updatePeerStatus();
-        }, CLAIM_GRACE_MS);
-        renderBattlefieldCharacters(); // reflect "reconnecting" state immediately
+        entry.claimedBy = null;
+        renderBattlefieldCharacters();
       }
     }
     updatePeerStatus();
@@ -1052,16 +1038,7 @@ function updatePeerStatus() {
   const el = document.getElementById('peer-status');
   if (!dmPeer) { el.textContent = ''; return; }
   const players = dmPeer.getConnectedPlayers();
-  // Count characters with an active grace timer (disconnected but not yet unclaimed)
-  let reconnecting = 0;
-  if (currentSession) {
-    for (const entry of Object.values(currentSession.characters)) {
-      if (entry._graceTimer) reconnecting++;
-    }
-  }
-  let text = `${players.length} player${players.length !== 1 ? 's' : ''} connected`;
-  if (reconnecting > 0) text += ` (${reconnecting} reconnecting)`;
-  el.textContent = text;
+  el.textContent = `${players.length} player${players.length !== 1 ? 's' : ''} connected`;
 }
 
 function showSessionActive() {
@@ -1075,12 +1052,6 @@ function showSessionActive() {
 async function endSession() {
   if (!await dialogConfirm('End the current session? Players will be disconnected.', 'End Session')) return;
   if (dmPeer) { dmPeer.destroy(); dmPeer = null; }
-  // Clear any pending grace timers
-  if (currentSession) {
-    for (const entry of Object.values(currentSession.characters)) {
-      if (entry._graceTimer) { clearTimeout(entry._graceTimer); entry._graceTimer = null; }
-    }
-  }
   currentSession = null;
   document.getElementById('session-status').textContent = 'No active session';
   document.getElementById('btn-new-session').style.display = '';
@@ -1419,11 +1390,10 @@ function drawBattlefieldCharacters() {
     let hpColor = 'var(--hp-high)';
     if (hpPercent <= 25) hpColor = 'var(--hp-low)';
     else if (hpPercent <= 50) hpColor = 'var(--hp-mid)';
-    const isReconnecting = currentSession?.characters[c._id]?._graceTimer;
     return `
       <div class="bf-card" data-char-hp-id="${c._id}">
         <div class="bf-header">
-          <strong>${esc(c.name)}</strong>${isReconnecting ? ' <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(reconnecting…)</span>' : ''}
+          <strong>${esc(c.name)}</strong>
           <span style="color:var(--text-muted);font-size:0.8rem;">Lvl ${c.level} ${esc(c.species || '')} ${esc(c.class)} | AC ${c.AC}</span>
         </div>
         <div class="bf-hp-row">
