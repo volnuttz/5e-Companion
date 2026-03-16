@@ -983,8 +983,16 @@ function setupPeerHandlers() {
         return;
       }
       if (charEntry.claimedBy) {
-        dmPeer.sendToPlayer(peerId, { type: 'claim-error', error: 'Character already claimed' });
-        return;
+        // Allow reclaim if the previous claimer is no longer connected.
+        const connectedPeers = dmPeer.getConnectedPlayers();
+        const claimerStillConnected = connectedPeers.some(
+          p => p.characterId === characterId && p.peerId !== peerId
+        );
+        if (claimerStillConnected) {
+          dmPeer.sendToPlayer(peerId, { type: 'claim-error', error: 'Character already claimed' });
+          return;
+        }
+        // Previous claimer disconnected — allow reclaim.
       }
       charEntry.claimedBy = playerName;
       dmPeer.setPlayerInfo(peerId, playerName, characterId);
@@ -1003,14 +1011,27 @@ function setupPeerHandlers() {
   });
 
   dmPeer.onPlayerDisconnect((peerId, info) => {
-    // Immediately unclaim the character so the player must rejoin with PIN.
-    if (currentSession && info && info.characterId) {
+    if (!currentSession) { updatePeerStatus(); return; }
+    let changed = false;
+    // Unclaim via tracked characterId (fast path).
+    if (info && info.characterId) {
       const entry = currentSession.characters[info.characterId];
       if (entry && entry.claimedBy) {
         entry.claimedBy = null;
-        renderBattlefieldCharacters();
+        changed = true;
       }
     }
+    // Also scan all characters for claims by this peer's playerName
+    // in case info.characterId was missing (e.g. stale connection cleanup).
+    if (info && info.playerName) {
+      for (const entry of Object.values(currentSession.characters)) {
+        if (entry.claimedBy === info.playerName) {
+          entry.claimedBy = null;
+          changed = true;
+        }
+      }
+    }
+    if (changed) renderBattlefieldCharacters();
     updatePeerStatus();
   });
 
