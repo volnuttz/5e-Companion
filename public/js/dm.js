@@ -1216,6 +1216,13 @@ async function loadBattlefield() {
     const saved = await db.getBattlefield();
     battlefieldMonsters = [];
     saved.forEach(entry => {
+      if (entry._custom) {
+        battlefieldMonsters.push({
+          ...entry, _uid: ++_bfUid, _editing: false,
+          currentHP: entry.currentHP != null ? entry.currentHP : entry.HP
+        });
+        return;
+      }
       const m = allMonsters.find(m => m.name === entry.name);
       if (!m) return;
       battlefieldMonsters.push({
@@ -1229,7 +1236,15 @@ async function loadBattlefield() {
 }
 
 function saveBattlefield() {
-  const compact = battlefieldMonsters.map(m => ({ name: m.name, _label: m._label, currentHP: m.currentHP }));
+  const compact = battlefieldMonsters.map(m => {
+    if (m._custom) {
+      return { name: m.name, _label: m._label, currentHP: m.currentHP, _custom: true,
+        size: m.size, type: m.type, AC: m.AC, HP: m.HP, CR: m.CR,
+        STR: m.STR, DEX: m.DEX, CON: m.CON, INT: m.INT, WIS: m.WIS, CHA: m.CHA,
+        actions: m.actions || [], traits: m.traits || [] };
+    }
+    return { name: m.name, _label: m._label, currentHP: m.currentHP };
+  });
   db.saveBattlefield(compact);
 }
 
@@ -1247,6 +1262,53 @@ function addToBattlefield(idx) {
   const m = allMonsters[idx];
   if (!m) return;
   battlefieldMonsters.push({ ...m, _uid: ++_bfUid, _label: m.name, currentHP: m.HP });
+  relabelBattlefield();
+  renderBattlefield();
+  saveBattlefield();
+}
+
+function addCustomMonster() {
+  if (battlefieldMonsters.length >= 50) { dialogAlert('Battlefield limit reached (max 50).', 'Limit Reached', 'error'); return; }
+  const m = {
+    name: '', size: 'Medium', type: 'Custom', AC: 10, HP: 10, CR: '0',
+    STR: 10, DEX: 10, CON: 10, INT: 10, WIS: 10, CHA: 10,
+    actions: [], traits: [], _custom: true, _editing: true,
+    _uid: ++_bfUid, _label: '', currentHP: 10
+  };
+  battlefieldMonsters.push(m);
+  renderBattlefield();
+  saveBattlefield();
+  setTimeout(() => {
+    const input = document.querySelector(`.bf-card[data-uid="${m._uid}"] .bf-custom-name`);
+    if (input) input.focus();
+  }, 50);
+}
+
+function editCustomMonster(uid) {
+  const m = battlefieldMonsters.find(b => b._uid === uid);
+  if (!m || !m._custom) return;
+  m._editing = true;
+  renderBattlefield();
+}
+
+function updateCustomMonster(uid, field, value) {
+  const m = battlefieldMonsters.find(b => b._uid === uid);
+  if (!m || !m._custom) return;
+  if (['AC', 'HP', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].includes(field)) {
+    m[field] = Math.max(1, parseInt(value) || 1);
+    if (field === 'HP') m.currentHP = m.HP;
+  } else {
+    m[field] = value;
+  }
+  if (field === 'name') { m._label = value; relabelBattlefield(); }
+  saveBattlefield();
+}
+
+function finishCustomMonster(uid) {
+  const m = battlefieldMonsters.find(b => b._uid === uid);
+  if (!m || !m._custom) return;
+  if (!m.name.trim()) { dialogAlert('Please enter a monster name.', 'Custom Monster', 'info'); return; }
+  m._editing = false;
   relabelBattlefield();
   renderBattlefield();
   saveBattlefield();
@@ -1275,14 +1337,37 @@ function renderBattlefield() {
   emptyMsg.style.display = 'none';
 
   container.innerHTML = battlefieldMonsters.map(m => {
+    if (m._custom && m._editing) {
+      return `
+      <div class="bf-card" data-uid="${m._uid}" style="border-left:3px solid var(--gold);">
+        <div class="bf-header">
+          <strong style="color:var(--gold);font-size:0.8rem;">Custom Monster</strong>
+          <button class="remove-item" onclick="removeFromBattlefield(${m._uid})" title="Remove">&times;</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;">
+          <div class="form-group" style="flex:2;margin:0;min-width:140px;"><label>Name</label><input type="text" class="bf-custom-name" value="${esc(m.name)}" placeholder="Monster name" onchange="updateCustomMonster(${m._uid},'name',this.value)"></div>
+          <div class="form-group" style="flex:1;margin:0;min-width:90px;"><label>Size</label>
+            <select onchange="updateCustomMonster(${m._uid},'size',this.value)">
+              ${['Tiny','Small','Medium','Large','Huge','Gargantuan'].map(s => `<option ${m.size === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group" style="flex:0 0 60px;margin:0;"><label>AC</label><input type="number" value="${m.AC}" min="1" onchange="updateCustomMonster(${m._uid},'AC',this.value)"></div>
+          <div class="form-group" style="flex:0 0 60px;margin:0;"><label>HP</label><input type="number" value="${m.HP}" min="1" onchange="updateCustomMonster(${m._uid},'HP',this.value)"></div>
+          <div class="form-group" style="flex:0 0 60px;margin:0;"><label>CR</label><input type="text" value="${esc(m.CR)}" onchange="updateCustomMonster(${m._uid},'CR',this.value)" style="width:100%;"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+          <button type="button" class="btn btn-primary btn-small" onclick="finishCustomMonster(${m._uid})">Done</button>
+        </div>
+      </div>`;
+    }
     const hpPercent = Math.max(0, (m.currentHP / m.HP) * 100);
     let hpColor = 'var(--hp-high)';
     if (hpPercent <= 25) hpColor = 'var(--hp-low)';
     else if (hpPercent <= 50) hpColor = 'var(--hp-mid)';
     return `
-      <div class="bf-card" data-uid="${m._uid}">
+      <div class="bf-card" data-uid="${m._uid}"${m._custom ? ' style="border-left:3px solid var(--gold);"' : ''}>
         <div class="bf-header">
-          <strong class="bf-name" onclick="showMonsterStats(${m._uid})" style="cursor:pointer;">${esc(m._label)}</strong>
+          <strong class="bf-name" onclick="${m._custom ? `editCustomMonster(${m._uid})` : `showMonsterStats(${m._uid})`}" style="cursor:pointer;">${esc(m._label)}</strong>
           <span style="color:var(--text-muted);font-size:0.8rem;">${esc(m.size || '')} ${esc(m.type || '')} | AC ${m.AC} | CR ${m.CR}</span>
           <button class="remove-item" onclick="removeFromBattlefield(${m._uid})" title="Remove">&times;</button>
         </div>
@@ -1869,6 +1954,24 @@ function filterTreasureSearch() {
   resultsEl._filtered = filtered;
 }
 
+function addCustomTreasure() {
+  treasurePool.push({ name: '', type: '', description: '', quantity: 1, _editing: true });
+  renderTreasures();
+  saveTreasures();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('#treasure-list .treasure-custom-name');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+
+function updateCustomTreasure(idx, field, value) {
+  const item = treasurePool[idx];
+  if (!item) return;
+  if (field === 'quantity') item.quantity = Math.max(1, parseInt(value) || 1);
+  else item[field] = value;
+  saveTreasures();
+}
+
 function addToTreasures(idx, el) {
   const resultsEl = document.getElementById('treasure-results');
   const e = resultsEl._filtered[idx];
@@ -1906,8 +2009,27 @@ function renderTreasures() {
   const emptyMsg = document.getElementById('treasure-empty');
   if (treasurePool.length === 0) { container.innerHTML = ''; emptyMsg.style.display = ''; return; }
   emptyMsg.style.display = 'none';
+  const charOptions = allCharacters.map(c => `<option value="${c._id}">${esc(c.name)}</option>`).join('');
   container.innerHTML = treasurePool.map((item, idx) => {
-    const charOptions = allCharacters.map(c => `<option value="${c._id}">${esc(c.name)}</option>`).join('');
+    if (item._editing) {
+      return `
+      <div class="list-item" style="flex-wrap:wrap;padding:10px 12px;gap:8px;border-left:3px solid var(--gold);">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;flex:1;">
+          <div class="form-group" style="flex:2;margin:0;min-width:140px;"><label>Name</label><input type="text" class="treasure-custom-name" value="${esc(item.name)}" placeholder="Item name" onchange="updateCustomTreasure(${idx},'name',this.value)"></div>
+          <div class="form-group" style="flex:1;margin:0;min-width:100px;"><label>Type</label><input type="text" value="${esc(item.type)}" placeholder="Weapon, Armor, etc." onchange="updateCustomTreasure(${idx},'type',this.value)"></div>
+          <div class="form-group" style="flex:0 0 60px;margin:0;"><label>Qty</label><input type="number" value="${item.quantity}" min="1" onchange="updateCustomTreasure(${idx},'quantity',this.value)"></div>
+          <div class="form-group" style="flex:1 1 100%;margin:0;"><label>Description</label><input type="text" value="${esc(item.description)}" placeholder="Damage, properties, etc." onchange="updateCustomTreasure(${idx},'description',this.value)"></div>
+        </div>
+        <div class="item-actions" style="display:flex;align-items:center;gap:6px;">
+          <select id="treasure-assign-${idx}" style="padding:4px 8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:0.85rem;">
+            <option value="">Assign to...</option>
+            ${charOptions}
+          </select>
+          <button type="button" class="btn btn-primary btn-small" onclick="assignTreasure(${idx})">Assign</button>
+          <button type="button" class="remove-item" onclick="removeFromTreasures(${idx})">&times;</button>
+        </div>
+      </div>`;
+    }
     return `
       <div class="list-item" style="flex-wrap:wrap;align-items:center;padding:10px 12px;gap:8px;">
         <div style="flex:1;min-width:150px;">
