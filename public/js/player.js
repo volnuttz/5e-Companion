@@ -45,6 +45,7 @@ let playerPeer = null;
 let currentCharacter = null; // cached character data from DM
 let currentHPState = null;   // cached HP state from DM
 let joinTimeout = null;
+let _autoReclaiming = false; // true while auto-reclaiming after reconnect
 
 // Player-local session state (preserved across DM updates)
 let playerState = {
@@ -177,13 +178,16 @@ function handleDMMessage(msg) {
       document.getElementById('btn-join').disabled = false;
       document.getElementById('btn-join').textContent = 'Join';
       // If we previously had a character, auto-reclaim it (reconnect scenario).
+      // Always attempt reclaim regardless of claimed status — the DM will allow it
+      // if the old connection is stale (e.g. phone was backgrounded).
       if (activeCharacterId) {
         const prev = msg.characters.find(c => c._id === activeCharacterId);
-        if (prev && !prev.claimed) {
+        if (prev) {
+          _autoReclaiming = true;
           playerPeer.sendToDM({ type: 'claim', characterId: activeCharacterId, playerName: 'player-' + Date.now() });
           break;
         }
-        // Character no longer available — fall through to picker
+        // Character no longer in session — fall through to picker
         activeCharacterId = null;
         currentCharacter = null;
         currentHPState = null;
@@ -205,6 +209,7 @@ function handleDMMessage(msg) {
 
     case 'claim-ok':
       clearTimeout(joinTimeout);
+      _autoReclaiming = false;
       activeCharacterId = msg.characterId;
       currentCharacter = msg.character;
       currentHPState = msg.hpState;
@@ -213,7 +218,18 @@ function handleDMMessage(msg) {
       break;
 
     case 'claim-error':
-      dialogAlert(msg.error || 'Could not select character', 'Error', 'error');
+      if (_autoReclaiming) {
+        // Auto-reclaim after reconnect failed (someone else truly has it).
+        // Fall back to the character picker gracefully.
+        _autoReclaiming = false;
+        activeCharacterId = null;
+        currentCharacter = null;
+        currentHPState = null;
+        // Re-send join to get a fresh character list for the picker.
+        playerPeer.sendToDM({ type: 'join', pin: sessionPin });
+      } else {
+        dialogAlert(msg.error || 'Could not select character', 'Error', 'error');
+      }
       break;
 
     case 'character-update':
