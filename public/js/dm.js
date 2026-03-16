@@ -125,14 +125,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('spell-level-filter').addEventListener('change', filterSpells);
   document.getElementById('spell-class-filter').addEventListener('change', filterSpells);
 
-  // Compendium
-  document.getElementById('compendium-search').addEventListener('input', filterCompendium);
+  // Compendium (top bar search)
+  const topBarSearch = document.getElementById('top-bar-search');
+  const topBarDropdown = document.getElementById('top-bar-dropdown');
+  topBarSearch.addEventListener('input', () => { openSearchDropdown(); filterCompendium(); });
+  topBarSearch.addEventListener('focus', () => { openSearchDropdown(); filterCompendium(); });
   document.getElementById('compendium-category').addEventListener('change', filterCompendium);
   document.getElementById('compendium-spell-level').addEventListener('change', filterCompendium);
   document.getElementById('compendium-spell-class').addEventListener('change', filterCompendium);
   document.getElementById('compendium-monster-type').addEventListener('change', filterCompendium);
   document.getElementById('compendium-monster-cr').addEventListener('change', filterCompendium);
   document.getElementById('compendium-feature-source').addEventListener('change', filterCompendium);
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const wrap = document.querySelector('.top-bar-search-wrap');
+    if (wrap && !wrap.contains(e.target)) closeSearchDropdown();
+  });
+  topBarSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeSearchDropdown(); topBarSearch.blur(); }
+  });
 
   // Notes
   const notesEditor = document.getElementById('notes-editor');
@@ -1486,8 +1497,15 @@ function populateCompendiumMonsterFilters() {
   crs.forEach(cr => { const o = document.createElement('option'); o.value = cr; o.textContent = `CR ${cr}`; crEl.appendChild(o); });
 }
 
+function openSearchDropdown() {
+  document.getElementById('top-bar-dropdown').classList.add('open');
+}
+function closeSearchDropdown() {
+  document.getElementById('top-bar-dropdown').classList.remove('open');
+}
+
 function filterCompendium() {
-  const query = document.getElementById('compendium-search').value.trim().toLowerCase();
+  const query = document.getElementById('top-bar-search').value.trim().toLowerCase();
   const category = document.getElementById('compendium-category').value;
   document.getElementById('compendium-spell-filters').style.display = category === 'spell' ? 'flex' : 'none';
   document.getElementById('compendium-monster-filters').style.display = category === 'monster' ? 'flex' : 'none';
@@ -1558,6 +1576,7 @@ function filterCompendium() {
 }
 
 function showCompendiumDetail(type, item) {
+  closeSearchDropdown();
   const modal = document.getElementById('compendium-modal');
   document.getElementById('compendium-modal-title').textContent = item.name;
   let html = '';
