@@ -106,7 +106,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('monster-search').addEventListener('input', filterMonsters);
   document.getElementById('monster-type-filter').addEventListener('change', filterMonsters);
   document.getElementById('monster-cr-filter').addEventListener('change', filterMonsters);
-  document.getElementById('btn-clear-battlefield').addEventListener('click', clearBattlefield);
   document.getElementById('btn-add-monsters').addEventListener('click', () => {
     document.getElementById('monster-search-modal').classList.add('active');
     document.getElementById('monster-search').focus();
@@ -115,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Treasures
   document.getElementById('treasure-search').addEventListener('input', filterTreasureSearch);
   document.getElementById('treasure-type-filter').addEventListener('change', filterTreasureSearch);
-  document.getElementById('btn-clear-treasures').addEventListener('click', clearTreasures);
   document.getElementById('btn-add-items').addEventListener('click', () => {
     document.getElementById('treasure-search-modal').classList.add('active');
     document.getElementById('treasure-search').focus();
@@ -123,6 +121,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Shops
   document.getElementById('btn-create-shop').addEventListener('click', createShop);
+  document.getElementById('shop-item-search').addEventListener('input', filterShopItems);
+  document.getElementById('shop-item-type-filter').addEventListener('change', filterShopItems);
 
   // Equipment search
   document.getElementById('equip-search').addEventListener('input', filterEquipment);
@@ -692,7 +692,7 @@ function renderCharacterList(chars) {
       <div class="char-item-actions" style="display:flex;gap:6px;">
         <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();openCharModal('${c._id}')">Edit</button>
         <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();exportCharacter('${c._id}')">Export</button>
-        <button class="btn btn-danger btn-small" onclick="event.stopPropagation();deleteCharacter('${c._id}')">Delete</button>
+        <button class="remove-item" onclick="event.stopPropagation();deleteCharacter('${c._id}')" title="Delete">&times;</button>
       </div>
     </div>
   `).join('');
@@ -1966,16 +1966,25 @@ function parseCostString(costStr) {
   return { price: 0, denomination: 'GP' };
 }
 
-function filterShopItems(shopIdx) {
-  const search = document.getElementById(`shop-search-${shopIdx}`);
-  const typeFilter = document.getElementById(`shop-type-${shopIdx}`);
-  const resultsEl = document.getElementById(`shop-results-${shopIdx}`);
-  if (!search || !resultsEl) return;
-  const query = search.value.trim().toLowerCase();
-  const type = typeFilter.value;
-  if (!query && !type) { resultsEl.style.display = 'none'; return; }
+let _activeShopIdx = -1;
+
+function openShopItemModal(shopIdx) {
+  _activeShopIdx = shopIdx;
+  document.getElementById('shop-search-modal').classList.add('active');
+  const searchInput = document.getElementById('shop-item-search');
+  searchInput.value = '';
+  document.getElementById('shop-item-type-filter').value = '';
+  document.getElementById('shop-item-results').style.display = 'none';
+  searchInput.focus();
+}
+
+function filterShopItems() {
+  const query = document.getElementById('shop-item-search').value.trim().toLowerCase();
+  const typeFilter = document.getElementById('shop-item-type-filter').value;
+  const resultsEl = document.getElementById('shop-item-results');
+  if (!query && !typeFilter) { resultsEl.style.display = 'none'; return; }
   let filtered = allEquipment;
-  if (type) filtered = filtered.filter(e => e.type === type);
+  if (typeFilter) filtered = filtered.filter(e => e.type === typeFilter);
   if (query) filtered = filtered.filter(e =>
     e.name.toLowerCase().includes(query) || (e.category && e.category.toLowerCase().includes(query))
   );
@@ -1985,23 +1994,23 @@ function filterShopItems(shopIdx) {
     if (e.damage) detail += ` | ${e.damage}`;
     if (e.AC) detail += ` | AC: ${e.AC}`;
     if (e.cost) detail += ` | ${e.cost}`;
-    return `<div class="list-item" style="cursor:pointer;" onclick="addItemToShop(${shopIdx}, ${i})">
+    return `<div class="list-item" style="cursor:pointer;" onclick="addItemToShop(${i})">
         <div><strong>${esc(e.name)}</strong><span style="color:var(--text-muted);font-size:0.8rem;margin-left:6px;">${esc(detail)}</span></div>
       </div>`;
   }).join('') || '<div style="padding:8px;color:var(--text-muted);">No items found</div>';
   resultsEl._filtered = filtered;
 }
 
-function addItemToShop(shopIdx, filteredIdx) {
-  const resultsEl = document.getElementById(`shop-results-${shopIdx}`);
+function addItemToShop(filteredIdx) {
+  const resultsEl = document.getElementById('shop-item-results');
   const e = resultsEl._filtered[filteredIdx];
-  if (!e) return;
+  if (!e || _activeShopIdx < 0 || !shops[_activeShopIdx]) return;
   let desc = '';
   if (e.damage) desc += e.damage;
   if (e.AC) desc += (desc ? ' | ' : '') + 'AC: ' + e.AC;
   if (e.properties && e.properties !== '—') desc += (desc ? ' | ' : '') + e.properties;
   const { price, denomination } = parseCostString(e.cost);
-  shops[shopIdx].items.push({ name: e.name, type: e.category || e.type, description: desc, price, denomination, quantity: -1 });
+  shops[_activeShopIdx].items.push({ name: e.name, type: e.category || e.type, description: desc, price, denomination, quantity: -1 });
   renderShops();
   saveShops();
 }
@@ -2028,14 +2037,11 @@ function renderShops() {
   const container = document.getElementById('shops-list');
   const emptyMsg = document.getElementById('shops-empty');
   const savedSelections = {};
-  const savedSearches = {};
   shops.forEach((shop, si) => {
     shop.items.forEach((_, ii) => {
       const sel = document.getElementById(`shop-sell-${si}-${ii}`);
       if (sel && sel.value) savedSelections[`${si}-${ii}`] = sel.value;
     });
-    const search = document.getElementById(`shop-search-${si}`);
-    if (search && search.value) savedSearches[si] = search.value;
   });
   if (shops.length === 0) { container.innerHTML = ''; emptyMsg.style.display = ''; return; }
   emptyMsg.style.display = 'none';
@@ -2080,23 +2086,18 @@ function renderShops() {
     return `<div class="card" style="margin-top:12px;border-left:3px solid var(--gold);">
         <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <h3 style="margin:0;">${esc(shop.name)}</h3>
-          <button class="btn btn-danger btn-small" onclick="deleteShop(${si})">Delete Shop</button>
+          <button class="remove-item" onclick="deleteShop(${si})" title="Delete Shop">&times;</button>
         </div>
-        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
-          <input type="text" id="shop-search-${si}" placeholder="Search equipment..." oninput="filterShopItems(${si})" style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
-          <select id="shop-type-${si}" onchange="filterShopItems(${si})" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
-            <option value="">All Types</option><option value="Weapon">Weapons</option><option value="Armor">Armor</option><option value="Item">Items</option>
-          </select>
-        </div>
-        <div id="shop-results-${si}" class="list-section" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
         <div id="shop-inventory-${si}" style="margin-top:8px;">
           ${itemsHtml || '<p style="color:var(--text-muted);margin:4px 0;">No items in this shop yet.</p>'}
         </div>
-        <button type="button" class="btn btn-secondary btn-small" onclick="addCustomShopItem(${si})" style="margin-top:8px;">+ Add Custom</button>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button type="button" class="btn btn-primary btn-small" onclick="openShopItemModal(${si})">Add Items</button>
+          <button type="button" class="btn btn-secondary btn-small" onclick="addCustomShopItem(${si})">+ Add Custom</button>
+        </div>
       </div>`;
   }).join('');
   for (const [key, val] of Object.entries(savedSelections)) { const sel = document.getElementById(`shop-sell-${key}`); if (sel) sel.value = val; }
-  for (const [si, val] of Object.entries(savedSearches)) { const search = document.getElementById(`shop-search-${si}`); if (search) search.value = val; }
 }
 
 async function sellShopItem(shopIdx, itemIdx) {
