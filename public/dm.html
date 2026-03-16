@@ -17,6 +17,12 @@
         <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">&times;</button>
       </div>
       <div class="sidebar-section">
+        <h3>Characters</h3>
+        <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
+        <button class="btn btn-secondary sidebar-btn" onclick="document.getElementById('import-char-file').click()">Import Character (TOML)</button>
+        <button class="btn btn-secondary sidebar-btn" id="btn-export-all-chars">Export Character</button>
+      </div>
+      <div class="sidebar-section">
         <h3>Workspace</h3>
         <button class="btn btn-secondary sidebar-btn" id="btn-save-workspace" aria-label="Save Workspace">Save Workspace</button>
         <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
@@ -119,8 +125,6 @@
       <div class="card">
         <div class="header-row" style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;">
           <div style="display:flex;gap:6px;">
-            <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
-            <button class="btn btn-secondary btn-small" onclick="document.getElementById('import-char-file').click()">Import TOML</button>
             <button class="btn btn-primary btn-small" id="btn-add-char">+ New Character</button>
           </div>
         </div>
@@ -205,11 +209,10 @@
       <div class="card">
         <div class="header-row" style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px;">
           <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" id="new-shop-name" placeholder="Shop name..." style="padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <button class="btn btn-primary btn-small" id="btn-create-shop">+ New Shop</button>
           </div>
         </div>
-        <p id="shops-empty" style="color:var(--text-muted);">No shops created. Enter a name and click "+ New Shop" to get started.</p>
+        <p id="shops-empty" style="color:var(--text-muted);">No shops created. Click "+ New Shop" to get started.</p>
         <div id="shops-list"></div>
       </div>
     </div>
