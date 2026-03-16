@@ -3,11 +3,14 @@
 
 const DND_PEER_PREFIX = 'dnd-companion-';
 
+const STALE_CONNECTION_TIMEOUT = 60000; // 60s without ping = stale
+const STALE_CHECK_INTERVAL = 15000;     // check every 15s
+
 // --- DM (Host) Side ---
 
 function createDMPeer(roomId) {
   const peerId = DND_PEER_PREFIX + roomId;
-  const connections = new Map(); // peerId -> { conn, playerName, characterId }
+  const connections = new Map(); // peerId -> { conn, playerName, characterId, lastActivity }
   let peer = null;
   let _onPlayerConnect = null;
   let _onPlayerDisconnect = null;
@@ -15,6 +18,7 @@ function createDMPeer(roomId) {
   let _onSignalingDisconnect = null;
   let _onSignalingReconnect = null;
   let _destroyed = false;
+  let _staleCheckTimer = null;
 
   function init() {
     return new Promise((resolve, reject) => {
@@ -67,10 +71,14 @@ function createDMPeer(roomId) {
 
   function _handleIncomingConnection(conn) {
     conn.on('open', () => {
-      connections.set(conn.peer, { conn, playerName: null, characterId: null });
+      connections.set(conn.peer, { conn, playerName: null, characterId: null, lastActivity: Date.now() });
       if (_onPlayerConnect) _onPlayerConnect(conn.peer);
+      _ensureStaleCheck();
     });
     conn.on('data', (data) => {
+      // Update last activity timestamp on any incoming data.
+      const entry = connections.get(conn.peer);
+      if (entry) entry.lastActivity = Date.now();
       // Respond to keep-alive pings so players can verify the link is alive.
       if (data && data.type === 'ping') {
         try { conn.send({ type: 'pong', ts: data.ts }); } catch (e) {}
@@ -87,6 +95,26 @@ function createDMPeer(roomId) {
       connections.delete(conn.peer);
       if (_onPlayerDisconnect) _onPlayerDisconnect(conn.peer, info);
     });
+  }
+
+  function _ensureStaleCheck() {
+    if (_staleCheckTimer) return;
+    _staleCheckTimer = setInterval(() => {
+      if (_destroyed) { clearInterval(_staleCheckTimer); _staleCheckTimer = null; return; }
+      const now = Date.now();
+      for (const [id, entry] of connections) {
+        if (now - entry.lastActivity > STALE_CONNECTION_TIMEOUT) {
+          console.log('[Peer] Stale connection detected:', id);
+          connections.delete(id);
+          try { entry.conn.close(); } catch (e) {}
+          if (_onPlayerDisconnect) _onPlayerDisconnect(id, entry);
+        }
+      }
+      if (connections.size === 0) {
+        clearInterval(_staleCheckTimer);
+        _staleCheckTimer = null;
+      }
+    }, STALE_CHECK_INTERVAL);
   }
 
   function broadcastToAll(message) {
@@ -132,6 +160,7 @@ function createDMPeer(roomId) {
 
   function destroy() {
     _destroyed = true;
+    if (_staleCheckTimer) { clearInterval(_staleCheckTimer); _staleCheckTimer = null; }
     if (peer) {
       peer.destroy();
       peer = null;

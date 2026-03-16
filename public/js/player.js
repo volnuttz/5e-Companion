@@ -153,6 +153,12 @@ function handleConnected() {
   hideBanner();
   document.getElementById('btn-join').disabled = false;
   document.getElementById('btn-join').textContent = 'Join';
+
+  // After auto-reconnect, re-join the session so the DM recognises us again.
+  // If we already had a character claimed, we'll auto-reclaim it in handleDMMessage.
+  if (sessionPin && activeCharacterId) {
+    playerPeer.sendToDM({ type: 'join', pin: sessionPin });
+  }
 }
 
 function handleDisconnect() {
@@ -170,8 +176,21 @@ function handleDMMessage(msg) {
       clearTimeout(joinTimeout);
       document.getElementById('btn-join').disabled = false;
       document.getElementById('btn-join').textContent = 'Join';
+      // If we previously had a character, auto-reclaim it (reconnect scenario).
+      if (activeCharacterId) {
+        const prev = msg.characters.find(c => c._id === activeCharacterId);
+        if (prev && !prev.claimed) {
+          playerPeer.sendToDM({ type: 'claim', characterId: activeCharacterId, playerName: 'player-' + Date.now() });
+          break;
+        }
+        // Character no longer available — fall through to picker
+        activeCharacterId = null;
+        currentCharacter = null;
+        currentHPState = null;
+      }
       document.getElementById('step-join').style.display = 'none';
       document.getElementById('step-pick').style.display = '';
+      document.getElementById('step-sheet').style.display = 'none';
       renderCharacterPicker(msg.characters);
       break;
 
