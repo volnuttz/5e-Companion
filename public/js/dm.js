@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-add-char').addEventListener('click', () => openCharModal());
   document.getElementById('char-form').addEventListener('submit', saveCharacter);
 
+  // Characters import/export
+  document.getElementById('btn-export-all-chars').addEventListener('click', showExportCharacterPicker);
+
   // Workspace
   document.getElementById('btn-save-workspace').addEventListener('click', saveWorkspace);
   document.getElementById('load-workspace-file').addEventListener('change', loadWorkspace);
@@ -690,8 +693,6 @@ function renderCharacterList(chars) {
         <span class="char-meta">Level ${c.level} ${esc(c.species || '')} ${esc(c.class)} — HP ${c.HP} / AC ${c.AC}</span>
       </div>
       <div class="char-item-actions" style="display:flex;gap:6px;">
-        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();openCharModal('${c._id}')">Edit</button>
-        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();exportCharacter('${c._id}')">Export</button>
         <button class="remove-item" onclick="event.stopPropagation();deleteCharacter('${c._id}')" title="Delete">&times;</button>
       </div>
     </div>
@@ -1770,6 +1771,34 @@ function parseCharFromTOML(text) {
   return c;
 }
 
+async function showExportCharacterPicker() {
+  const chars = await db.getAllCharacters();
+  if (!chars.length) { dialogAlert('No characters to export.', 'Export', 'info'); return; }
+  if (chars.length === 1) { exportCharacter(chars[0]._id); closeSidebar(); return; }
+  const overlay = document.getElementById('dialog-overlay');
+  const iconEl = document.getElementById('dialog-icon');
+  const titleEl = document.getElementById('dialog-title');
+  const msgEl = document.getElementById('dialog-message');
+  const btnsEl = document.getElementById('dialog-buttons');
+  iconEl.textContent = DIALOG_ICONS.info;
+  iconEl.className = 'dialog-icon info';
+  titleEl.textContent = 'Export Character';
+  msgEl.textContent = 'Select a character to export:';
+  btnsEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;width:100%;">
+    ${chars.map(c => `<button class="btn btn-secondary btn-small" data-export-id="${c._id}">${esc(c.name || 'Unnamed')}</button>`).join('')}
+    <button class="btn btn-secondary btn-small" data-export-id="__cancel">Cancel</button>
+  </div>`;
+  overlay.classList.add('active');
+  closeSidebar();
+  btnsEl.querySelectorAll('[data-export-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      overlay.classList.remove('active');
+      const id = btn.dataset.exportId;
+      if (id !== '__cancel') exportCharacter(id);
+    });
+  });
+}
+
 async function exportCharacter(id) {
   const c = await db.getCharacter(id);
   if (!c) { dialogAlert('Character not found.', 'Error', 'error'); return; }
@@ -1941,13 +1970,11 @@ function saveShops() {
   db.saveShops(clean);
 }
 
-function createShop() {
-  const input = document.getElementById('new-shop-name');
-  const name = input.value.trim();
-  if (!name) return;
+async function createShop() {
   if (shops.length >= 20) { dialogAlert('Maximum 20 shops.', 'Limit Reached', 'error'); return; }
+  const name = await dialogPrompt('Enter shop name:', 'New Shop');
+  if (!name) return;
   shops.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), name, items: [] });
-  input.value = '';
   renderShops();
   saveShops();
 }
