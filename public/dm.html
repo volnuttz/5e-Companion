@@ -117,8 +117,7 @@
     <!-- Characters Tab -->
     <div class="tab-content active" id="dm-tab-characters">
       <div class="card">
-        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h2 style="margin:0;">Characters</h2>
+        <div class="header-row" style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;">
           <div style="display:flex;gap:6px;">
             <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
             <button class="btn btn-secondary btn-small" onclick="document.getElementById('import-char-file').click()">Import TOML</button>
@@ -132,66 +131,81 @@
     <!-- Battlefield Tab -->
     <div class="tab-content" id="dm-tab-battlefield">
       <div class="card">
-        <h2 style="margin-bottom:12px;">Add Monsters</h2>
-        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
-          <input type="text" id="monster-search" placeholder="Search monsters..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
-          <select id="monster-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
-            <option value="">All Types</option>
-          </select>
-          <select id="monster-cr-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
-            <option value="">All CR</option>
-          </select>
-        </div>
-        <div id="monster-results" class="list-section" style="max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
-        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="margin:0;">Battlefield</h2>
-          <button class="btn btn-danger btn-small" id="btn-clear-battlefield">Clear All</button>
+        <div class="header-row" style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px;">
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-danger btn-small" id="btn-clear-battlefield">Clear All</button>
+            <button class="btn btn-primary btn-small" id="btn-add-monsters">Add Monsters</button>
+          </div>
         </div>
         <div id="battlefield-list"></div>
-        <p id="battlefield-empty" style="color:var(--text-muted);">No monsters on the battlefield. Search and add monsters above.</p>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
-        <h2 style="margin-bottom:12px;">Characters</h2>
         <div id="bf-characters-list"></div>
+        <p id="battlefield-empty" style="color:var(--text-muted);">No monsters on the battlefield.</p>
         <p id="bf-characters-empty" style="color:var(--text-muted);">No active session. Start a session to track character HP.</p>
+      </div>
+    </div>
+
+    <!-- Add Monsters Modal -->
+    <div class="modal-overlay" id="monster-search-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Add Monsters</h2>
+          <button class="modal-close" onclick="document.getElementById('monster-search-modal').classList.remove('active')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
+            <input type="text" id="monster-search" placeholder="Search monsters..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <select id="monster-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+              <option value="">All Types</option>
+            </select>
+            <select id="monster-cr-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+              <option value="">All CR</option>
+            </select>
+          </div>
+          <div id="monster-results" class="list-section" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+        </div>
       </div>
     </div>
 
     <!-- Treasures Tab -->
     <div class="tab-content" id="dm-tab-treasures">
       <div class="card">
-        <h2 style="margin-bottom:12px;">Add Items</h2>
-        <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
-          <input type="text" id="treasure-search" placeholder="Search equipment..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
-          <select id="treasure-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
-            <option value="">All Types</option>
-            <option value="Weapon">Weapons</option>
-            <option value="Armor">Armor</option>
-            <option value="Item">Items</option>
-          </select>
-        </div>
-        <div id="treasure-results" class="list-section" style="max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
-        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="margin:0;">Treasure Pool</h2>
-          <button class="btn btn-danger btn-small" id="btn-clear-treasures">Clear All</button>
+        <div class="header-row" style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px;">
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-danger btn-small" id="btn-clear-treasures">Clear All</button>
+            <button class="btn btn-primary btn-small" id="btn-add-items">Add Items</button>
+          </div>
         </div>
         <div id="treasure-list"></div>
-        <p id="treasure-empty" style="color:var(--text-muted);">No items in the treasure pool. Search and add items above.</p>
+        <p id="treasure-empty" style="color:var(--text-muted);">No items in the treasure pool.</p>
+      </div>
+    </div>
+
+    <!-- Add Items Modal -->
+    <div class="modal-overlay" id="treasure-search-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Add Items</h2>
+          <button class="modal-close" onclick="document.getElementById('treasure-search-modal').classList.remove('active')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="search-bar" style="display:flex;gap:8px;margin-bottom:10px;">
+            <input type="text" id="treasure-search" placeholder="Search equipment..." style="flex:1;padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <select id="treasure-type-filter" style="padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+              <option value="">All Types</option>
+              <option value="Weapon">Weapons</option>
+              <option value="Armor">Armor</option>
+              <option value="Item">Items</option>
+            </select>
+          </div>
+          <div id="treasure-results" class="list-section" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+        </div>
       </div>
     </div>
 
     <!-- Shops Tab -->
     <div class="tab-content" id="dm-tab-shops">
       <div class="card">
-        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="margin:0;">Shops</h2>
+        <div class="header-row" style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px;">
           <div style="display:flex;gap:8px;align-items:center;">
             <input type="text" id="new-shop-name" placeholder="Shop name..." style="padding:8px 12px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;">
             <button class="btn btn-primary btn-small" id="btn-create-shop">+ New Shop</button>
@@ -205,8 +219,7 @@
     <!-- Notes Tab -->
     <div class="tab-content" id="dm-tab-notes">
       <div class="card">
-        <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="margin:0;">Notes</h2>
+        <div class="header-row" style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px;">
           <div style="display:flex;gap:8px;align-items:center;">
             <span id="notes-save-status" style="font-size:0.8rem;color:var(--text-muted);"></span>
           </div>

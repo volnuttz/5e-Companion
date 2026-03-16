@@ -107,11 +107,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('monster-type-filter').addEventListener('change', filterMonsters);
   document.getElementById('monster-cr-filter').addEventListener('change', filterMonsters);
   document.getElementById('btn-clear-battlefield').addEventListener('click', clearBattlefield);
+  document.getElementById('btn-add-monsters').addEventListener('click', () => {
+    document.getElementById('monster-search-modal').classList.add('active');
+    document.getElementById('monster-search').focus();
+  });
 
   // Treasures
   document.getElementById('treasure-search').addEventListener('input', filterTreasureSearch);
   document.getElementById('treasure-type-filter').addEventListener('change', filterTreasureSearch);
   document.getElementById('btn-clear-treasures').addEventListener('click', clearTreasures);
+  document.getElementById('btn-add-items').addEventListener('click', () => {
+    document.getElementById('treasure-search-modal').classList.add('active');
+    document.getElementById('treasure-search').focus();
+  });
 
   // Shops
   document.getElementById('btn-create-shop').addEventListener('click', createShop);
@@ -1262,7 +1270,7 @@ function renderBattlefield() {
   const container = document.getElementById('battlefield-list');
   const emptyMsg = document.getElementById('battlefield-empty');
 
-  if (battlefieldMonsters.length === 0) { container.innerHTML = ''; emptyMsg.style.display = ''; return; }
+  if (battlefieldMonsters.length === 0) { container.innerHTML = ''; if (emptyMsg) emptyMsg.style.display = ''; return; }
   emptyMsg.style.display = 'none';
 
   container.innerHTML = battlefieldMonsters.map(m => {
