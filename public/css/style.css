@@ -51,7 +51,7 @@ body {
     padding: 28px 40px;
   }
   .top-bar-title {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
   }
   .top-bar-search-wrap {
     flex: 0 1 440px;
@@ -100,6 +100,7 @@ h2 {
 h3 {
   color: #000;
   margin-bottom: 8px;
+  font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -196,7 +197,7 @@ h3 {
 
 .top-bar-title {
   font-family: var(--font-heading);
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 1.5px;
@@ -350,7 +351,7 @@ h3 {
   left: -280px;
   width: 260px;
   height: 100%;
-  background: var(--bg-card);
+  background: var(--bg-dark) url('/img/background_texture.png') repeat;
   border-right: 1px solid var(--border-dark);
   box-shadow: 4px 0 16px rgba(0,0,0,0.15);
   z-index: 910;
@@ -1420,7 +1421,7 @@ h1.char-title {
     padding: 10px 0;
   }
   .top-bar-title {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     letter-spacing: 1px;
   }
   .top-bar-search-wrap {
