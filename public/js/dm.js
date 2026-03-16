@@ -967,13 +967,26 @@ function setupPeerHandlers() {
         dmPeer.sendToPlayer(peerId, { type: 'join-error', error: 'Invalid PIN' });
         return;
       }
-      // Send character list — characters in their grace period appear unclaimed so
-      // the reconnecting player can reclaim them immediately.
+      // Send character list — mark characters as claimed only if the claimer's
+      // connection is still alive (handles phone backgrounding / stale WebRTC).
       const chars = await db.getAllCharacters();
-      const charList = chars.map(c => ({
-        _id: c._id, name: c.name, class: c.class, species: c.species, level: c.level,
-        claimed: currentSession.characters[c._id]?.claimedBy || null
-      }));
+      const connectedPeers = dmPeer.getConnectedPlayers();
+      const charList = chars.map(c => {
+        const entry = currentSession.characters[c._id];
+        let claimed = entry?.claimedBy || null;
+        // If claimer's connection is dead, report as unclaimed so the picker
+        // shows it as available and auto-reclaim can proceed.
+        if (claimed) {
+          const claimerAlive = connectedPeers.some(
+            p => p.characterId === c._id && p.alive && p.peerId !== peerId
+          );
+          if (!claimerAlive) claimed = null;
+        }
+        return {
+          _id: c._id, name: c.name, class: c.class, species: c.species, level: c.level,
+          claimed
+        };
+      });
       dmPeer.sendToPlayer(peerId, { type: 'join-ok', characters: charList });
     } else if (msg.type === 'claim') {
       const { characterId, playerName } = msg;
@@ -983,16 +996,17 @@ function setupPeerHandlers() {
         return;
       }
       if (charEntry.claimedBy) {
-        // Allow reclaim if the previous claimer is no longer connected.
+        // Allow reclaim if the previous claimer is no longer connected or their
+        // connection is stale (e.g. phone backgrounded, WebRTC died silently).
         const connectedPeers = dmPeer.getConnectedPlayers();
         const claimerStillConnected = connectedPeers.some(
-          p => p.characterId === characterId && p.peerId !== peerId
+          p => p.characterId === characterId && p.peerId !== peerId && p.alive
         );
         if (claimerStillConnected) {
           dmPeer.sendToPlayer(peerId, { type: 'claim-error', error: 'Character already claimed' });
           return;
         }
-        // Previous claimer disconnected — allow reclaim.
+        // Previous claimer disconnected or connection dead — allow reclaim.
       }
       charEntry.claimedBy = playerName;
       dmPeer.setPlayerInfo(peerId, playerName, characterId);

@@ -141,7 +141,12 @@ function createDMPeer(roomId) {
   function getConnectedPlayers() {
     const players = [];
     for (const [id, entry] of connections) {
-      players.push({ peerId: id, playerName: entry.playerName, characterId: entry.characterId });
+      players.push({
+        peerId: id,
+        playerName: entry.playerName,
+        characterId: entry.characterId,
+        alive: !!(entry.conn && entry.conn.open)
+      });
     }
     return players;
   }
