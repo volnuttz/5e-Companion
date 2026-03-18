@@ -107,30 +107,30 @@ a:hover { color: hsl(0, 0%, 10%); }
   border-radius: 0.375rem;
 }
 
-/* Primary button: dark red D&D theme */
+/* Primary button: dark grey */
 .btn.btn-primary,
 button.btn-primary {
-  background-color: hsl(0, 45%, 28%) !important;
-  border-color: hsl(0, 45%, 24%) !important;
+  background-color: hsl(0, 0%, 25%) !important;
+  border-color: hsl(0, 0%, 18%) !important;
   color: #fff !important;
 }
 .btn.btn-primary:hover,
 button.btn-primary:hover {
-  background-color: hsl(0, 45%, 35%) !important;
-  border-color: hsl(0, 45%, 30%) !important;
+  background-color: hsl(0, 0%, 33%) !important;
+  border-color: hsl(0, 0%, 25%) !important;
 }
 
-/* Secondary button: warm gray */
+/* Secondary button: medium grey */
 .btn.btn-secondary,
 button.btn-secondary {
-  background-color: hsl(40, 10%, 40%) !important;
-  border-color: hsl(40, 10%, 35%) !important;
+  background-color: hsl(0, 0%, 40%) !important;
+  border-color: hsl(0, 0%, 33%) !important;
   color: #fff !important;
 }
 .btn.btn-secondary:hover,
 button.btn-secondary:hover {
-  background-color: hsl(40, 10%, 48%) !important;
-  border-color: hsl(40, 10%, 42%) !important;
+  background-color: hsl(0, 0%, 50%) !important;
+  border-color: hsl(0, 0%, 40%) !important;
 }
 
 /* .btn-danger is our existing name; map to DaisyUI error colors */
@@ -153,6 +153,42 @@ button.btn-small {
   height: auto;
   min-height: 2.25rem;
   font-size: 0.85rem;
+}
+
+/* ============================================================
+   CHECKBOXES — crimson D&D accent style
+   ============================================================ */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid hsl(0, 0%, 55%);
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  position: relative;
+}
+input[type="checkbox"]:checked {
+  background-color: hsl(0, 60%, 40%);
+  border-color: hsl(0, 60%, 36%);
+}
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+input[type="checkbox"]:hover {
+  border-color: hsl(0, 60%, 40%);
 }
 
 /* ============================================================
@@ -196,13 +232,14 @@ button.btn-small {
   position: sticky;
   top: 0;
   z-index: 200;
-  background: hsl(0, 45%, 22%);
+  background: hsl(0, 0%, 13%);
   color: hsl(42, 38%, 93%);
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.625rem 1rem;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+  border-bottom: 2px solid hsl(0, 60%, 40%);
 }
 
 .hamburger-btn {
@@ -311,12 +348,12 @@ button.btn-small {
   left: -300px;
   width: 275px;
   height: 100dvh;
-  background: hsl(0, 45%, 18%);
+  background: hsl(0, 0%, 10%);
   color: hsl(42, 38%, 93%);
   z-index: 400;
   transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.35);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.5);
 }
 .sidebar.open { left: 0; }
 
@@ -1027,7 +1064,7 @@ button.btn-small {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  background: hsl(0, 45%, 22%);
+  background: hsl(0, 0%, 15%);
   color: hsl(42, 38%, 93%);
   font-family: var(--font-heading);
   font-size: 0.82rem;
