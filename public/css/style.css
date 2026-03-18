@@ -254,6 +254,7 @@ input[type="checkbox"]:hover {
    NAVBAR (DaisyUI navbar, with custom DND styling)
    ============================================================ */
 .navbar {
+  background: hsl(0, 0%, 13%);
   box-shadow: 0 2px 16px rgba(0,0,0,0.4);
   border-bottom: 2px solid hsl(0, 60%, 40%);
 }
