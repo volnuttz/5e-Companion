@@ -124,17 +124,17 @@ button.btn-primary:hover {
   border-color: hsl(0, 0%, 25%) !important;
 }
 
-/* Secondary button: warm dark gold */
+/* Secondary button: light gray */
 .btn.btn-secondary,
 button.btn-secondary {
-  background-color: hsl(38, 42%, 28%) !important;
-  border-color: hsl(38, 42%, 20%) !important;
-  color: hsl(42, 60%, 92%) !important;
+  background-color: hsl(0, 0%, 92%) !important;
+  border-color: hsl(0, 0%, 78%) !important;
+  color: hsl(0, 0%, 18%) !important;
 }
 .btn.btn-secondary:hover,
 button.btn-secondary:hover {
-  background-color: hsl(38, 42%, 35%) !important;
-  border-color: hsl(38, 42%, 28%) !important;
+  background-color: hsl(0, 0%, 85%) !important;
+  border-color: hsl(0, 0%, 68%) !important;
 }
 
 /* .btn-danger is our existing name; map to DaisyUI error colors */
@@ -318,6 +318,7 @@ input[type="checkbox"]:hover {
   left: 0;
   right: 0;
   background: var(--bg-card);
+  color: var(--text);
   border: 1px solid var(--border-dark);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lift);
