@@ -14,7 +14,7 @@
 <body>
 
   <!-- Disconnect banner (shown when WebRTC drops) -->
-  <div id="disconnect-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:var(--accent);color:#fff;text-align:center;padding:8px;font-size:0.9rem;z-index:1000;">
+  <div id="disconnect-banner" class="alert alert-error fixed top-0 left-0 right-0 z-[1000] rounded-none justify-center py-2 text-sm" style="display:none;">
     Disconnected from DM. The session may have ended.
   </div>
 
@@ -50,10 +50,10 @@
     <div id="step-sheet" style="display:none;">
 
       <!-- Character Sheet Tabs -->
-      <div class="tabs">
-        <button class="tab active" data-tab="tab-stats">Stats</button>
-        <button class="tab" data-tab="tab-equipment">Equipment</button>
-        <button class="tab" data-tab="tab-spells">Spells</button>
+      <div role="tablist" class="tabs tabs-bordered">
+        <button role="tab" class="tab tab-active" data-tab="tab-stats">Stats</button>
+        <button role="tab" class="tab" data-tab="tab-equipment">Equipment</button>
+        <button role="tab" class="tab" data-tab="tab-spells">Spells</button>
       </div>
 
       <!-- Stats Tab -->
@@ -86,13 +86,13 @@
   </div><!-- /.container -->
 
   <!-- Generic Dialog Modal (alert / confirm) -->
-  <div class="dialog-overlay" id="dialog-overlay">
-    <div class="dialog">
-      <h3 id="dialog-title"></h3>
-      <p id="dialog-message"></p>
-      <div class="dialog-buttons" id="dialog-buttons"></div>
+  <dialog id="dialog-overlay" class="modal">
+    <div class="modal-box max-w-md text-center">
+      <h3 class="font-bold text-lg" id="dialog-title"></h3>
+      <p class="py-2" id="dialog-message"></p>
+      <div class="modal-action justify-center" id="dialog-buttons"></div>
     </div>
-  </div>
+  </dialog>
 
   <!-- SRD Footer -->
   <footer class="srd-footer">

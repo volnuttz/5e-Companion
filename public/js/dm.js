@@ -97,9 +97,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // DM page tabs
   document.querySelectorAll('.tabs .tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('tab-active'));
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+      tab.classList.add('tab-active');
       document.getElementById(tab.dataset.tab).classList.add('active');
       if (tab.dataset.tab === 'dm-tab-battlefield') renderBattlefieldCharacters();
     });
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('monster-type-filter').addEventListener('change', filterMonsters);
   document.getElementById('monster-cr-filter').addEventListener('change', filterMonsters);
   document.getElementById('btn-add-monsters').addEventListener('click', () => {
-    document.getElementById('monster-search-modal').classList.add('active');
+    document.getElementById('monster-search-modal').showModal();
     document.getElementById('monster-search').focus();
   });
 
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('treasure-search').addEventListener('input', filterTreasureSearch);
   document.getElementById('treasure-type-filter').addEventListener('change', filterTreasureSearch);
   document.getElementById('btn-add-items').addEventListener('click', () => {
-    document.getElementById('treasure-search-modal').classList.add('active');
+    document.getElementById('treasure-search-modal').showModal();
     document.getElementById('treasure-search').focus();
   });
 
@@ -203,12 +203,12 @@ function showDialog({ title, message, type = 'info', buttons = ['OK'] }) {
 
     btnsEl.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => {
-        overlay.classList.remove('active');
+        overlay.close();
         resolve(btn.dataset.dialogIdx === String(buttons.length - 1));
       });
     });
 
-    overlay.classList.add('active');
+    overlay.showModal();
   });
 }
 
@@ -243,7 +243,7 @@ function dialogPrompt(message, title, defaultValue) {
     const input = document.getElementById('dialog-prompt-input');
     input.select();
 
-    const close = (value) => { overlay.classList.remove('active'); resolve(value); };
+    const close = (value) => { overlay.close(); resolve(value); };
     wrapper.children[0].addEventListener('click', () => close(null));
     wrapper.children[1].addEventListener('click', () => close(input.value.trim()));
     input.addEventListener('keydown', (e) => {
@@ -251,7 +251,7 @@ function dialogPrompt(message, title, defaultValue) {
       if (e.key === 'Escape') close(null);
     });
 
-    overlay.classList.add('active');
+    overlay.showModal();
     input.focus();
   });
 }
@@ -770,21 +770,11 @@ async function openCharModal(id) {
   } else {
     document.getElementById('char-modal-title').textContent = 'New Character';
   }
-  modal.classList.add('active');
-  const scrollY = window.scrollY;
-  document.body.style.position = 'fixed';
-  document.body.style.top = `-${scrollY}px`;
-  document.body.style.width = '100%';
-  document.body.dataset.modalScrollY = scrollY;
+  modal.showModal();
 }
 
 function closeCharModal() {
-  document.getElementById('char-modal').classList.remove('active');
-  const scrollY = parseInt(document.body.dataset.modalScrollY || '0');
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  window.scrollTo(0, scrollY);
+  document.getElementById('char-modal').close();
 }
 
 async function saveCharacter(e) {
@@ -1116,7 +1106,7 @@ async function showQR() {
   QRCode.toCanvas(document.getElementById('qr-canvas'), url, { width: 256, margin: 2 });
   document.getElementById('qr-url').textContent = url;
   document.getElementById('qr-pin').textContent = currentSession.pin;
-  document.getElementById('qr-modal').classList.add('active');
+  document.getElementById('qr-modal').showModal();
 }
 
 function copySessionUrl() {
@@ -1447,7 +1437,7 @@ function showMonsterStats(uid) {
   if (!m) return;
   document.getElementById('monster-modal-title').textContent = m._label;
   document.getElementById('monster-stat-block').innerHTML = buildMonsterStatBlockHTML(m);
-  document.getElementById('monster-modal').classList.add('active');
+  document.getElementById('monster-modal').showModal();
 }
 
 // --- Character HP Tracking (Battlefield) ---
@@ -1697,18 +1687,19 @@ function showCompendiumDetail(type, item) {
     html += `<div style="margin-top:8px;line-height:1.6;">${esc(item.description)}</div>`;
   }
   document.getElementById('compendium-modal-body').innerHTML = html;
-  modal.classList.add('active');
+  modal.showModal();
 }
 
 // --- Util ---
 let _toastTimer;
 function showToast(msg) {
+  const container = document.getElementById('toast-container');
   const el = document.getElementById('toast');
-  if (!el) return;
+  if (!el || !container) return;
   clearTimeout(_toastTimer);
   el.textContent = msg;
-  el.classList.add('show');
-  _toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+  container.style.display = '';
+  _toastTimer = setTimeout(() => { container.style.display = 'none'; }, 2000);
 }
 
 function esc(str) {
@@ -1871,11 +1862,11 @@ async function showExportCharacterPicker() {
     ${chars.map(c => `<button class="btn btn-secondary btn-small" data-export-id="${c._id}">${esc(c.name || 'Unnamed')}</button>`).join('')}
     <button class="btn btn-secondary btn-small" data-export-id="__cancel">Cancel</button>
   </div>`;
-  overlay.classList.add('active');
+  overlay.showModal();
   closeSidebar();
   btnsEl.querySelectorAll('[data-export-id]').forEach(btn => {
     btn.addEventListener('click', () => {
-      overlay.classList.remove('active');
+      overlay.close();
       const id = btn.dataset.exportId;
       if (id !== '__cancel') exportCharacter(id);
     });
@@ -2118,7 +2109,7 @@ let _activeShopIdx = -1;
 
 function openShopItemModal(shopIdx) {
   _activeShopIdx = shopIdx;
-  document.getElementById('shop-search-modal').classList.add('active');
+  document.getElementById('shop-search-modal').showModal();
   const searchInput = document.getElementById('shop-item-search');
   searchInput.value = '';
   document.getElementById('shop-item-type-filter').value = '';

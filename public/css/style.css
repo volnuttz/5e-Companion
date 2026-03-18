@@ -206,6 +206,16 @@ input[type="checkbox"]:hover {
   border-color: hsl(0, 60%, 40%);
 }
 
+/* DaisyUI drawer-toggle checkbox should stay hidden */
+.drawer-toggle {
+  appearance: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  border: none !important;
+  position: absolute !important;
+  opacity: 0 !important;
+}
+
 /* ============================================================
    REMOVE BUTTON (× delete button used in JS-generated lists)
    ============================================================ */
@@ -241,40 +251,11 @@ input[type="checkbox"]:hover {
 }
 
 /* ============================================================
-   TOP BAR (fixed nav strip)
+   NAVBAR (DaisyUI navbar, with custom DND styling)
    ============================================================ */
-.top-bar {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  background: hsl(0, 0%, 13%);
-  color: hsl(42, 38%, 93%);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem 1rem;
+.navbar {
   box-shadow: 0 2px 16px rgba(0,0,0,0.4);
   border-bottom: 2px solid hsl(0, 60%, 40%);
-}
-
-.hamburger-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0.3rem 0.4rem;
-  border-radius: 4px;
-  transition: background 0.15s;
-}
-.hamburger-btn:hover { background: rgba(255,255,255,0.1); }
-.hamburger-btn span {
-  display: block;
-  width: 20px;
-  height: 2px;
-  background: hsl(42, 38%, 93%);
-  border-radius: 2px;
 }
 
 .top-bar-title {
@@ -287,26 +268,32 @@ input[type="checkbox"]:hover {
   text-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 
+/* Hamburger icon (three-line) inside the DaisyUI btn */
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.hamburger-icon span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: hsl(42, 38%, 93%);
+  border-radius: 2px;
+}
+
 .top-bar-search-wrap {
   position: relative;
   flex: 1;
   max-width: 480px;
 }
 
-.top-bar-search {
-  width: 100%;
-  padding: 0.45rem 0.875rem;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 0.375rem;
-  color: hsl(42, 38%, 93%);
+.top-bar-search-wrap .input {
   font-family: var(--font-body);
   font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.15s, background 0.15s;
 }
-.top-bar-search::placeholder { color: rgba(240,236,227,0.4); }
-.top-bar-search:focus {
+.top-bar-search-wrap .input::placeholder { color: rgba(240,236,227,0.4); }
+.top-bar-search-wrap .input:focus {
   background: rgba(255,255,255,0.15);
   border-color: hsl(42, 38%, 80%);
 }
@@ -367,32 +354,12 @@ input[type="checkbox"]:hover {
 }
 
 /* ============================================================
-   SIDEBAR (slide-in from right, JS toggles .open)
+   DRAWER SIDE (sidebar) — DaisyUI drawer with custom DND styling
    ============================================================ */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 300;
-  backdrop-filter: blur(2px);
-}
-.sidebar-overlay.active { display: block; }
-
-.sidebar {
-  position: fixed;
-  top: 0;
-  right: -300px;
-  width: 275px;
-  height: 100dvh;
+.menu-sidebar {
   background: hsl(0, 0%, 10%);
   color: hsl(42, 38%, 93%);
-  z-index: 400;
-  transition: right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-y: auto;
-  box-shadow: -4px 0 24px rgba(0,0,0,0.5);
 }
-.sidebar.open { right: 0; }
 
 .sidebar-header {
   display: flex;
@@ -407,18 +374,6 @@ input[type="checkbox"]:hover {
   color: hsl(42, 38%, 93%);
   letter-spacing: 0.05em;
 }
-.sidebar-close {
-  background: none;
-  border: none;
-  color: rgba(240,236,227,0.6);
-  font-size: 1.5rem;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
-}
-.sidebar-close:hover { color: hsl(42, 38%, 93%); background: rgba(255,255,255,0.08); }
 
 .sidebar-section {
   padding: 1rem 1.25rem;
@@ -466,16 +421,14 @@ input[type="checkbox"]:hover {
 }
 
 /* ============================================================
-   TABS (JS toggles .active — no .tab-active)
+   TABS (DaisyUI tabs-bordered with DND theme overrides)
+   JS toggles .tab-active for active state
    ============================================================ */
 .tabs {
   display: flex !important;
   overflow-x: auto;
-  border-bottom: 2px solid var(--border);
   background: var(--bg-card);
   scrollbar-width: none;
-  /* override DaisyUI grid */
-  grid-auto-flow: unset;
 }
 .tabs::-webkit-scrollbar { display: none; }
 
@@ -493,12 +446,12 @@ input[type="checkbox"]:hover {
   white-space: nowrap;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
   text-transform: uppercase;
-  /* override DaisyUI tab */
   height: auto !important;
   min-height: unset !important;
 }
 .tab:hover { color: hsl(0, 51%, 30%) !important; background: hsla(0, 51%, 36%, 0.05) !important; }
-.tab.active {
+.tab.tab-active,
+.tab[aria-selected="true"] {
   color: hsl(0, 51%, 32%) !important;
   border-bottom-color: hsl(0, 51%, 36%) !important;
   background: hsla(0, 51%, 36%, 0.06) !important;
@@ -509,47 +462,31 @@ input[type="checkbox"]:hover {
 .tab-content.active { display: block; }
 
 /* ============================================================
-   MODAL OVERLAY (div-based, JS toggles .active class)
+   MODALS (DaisyUI <dialog> with DND theme overrides)
    ============================================================ */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(25, 15, 5, 0.6);
-  backdrop-filter: blur(4px);
+.modal {
   z-index: 900;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 2rem 1rem;
-  overflow-y: auto;
 }
-.modal-overlay.active { display: flex; }
 
-.modal-overlay .modal {
+.modal-box {
   background: var(--bg-card) !important;
   border: 1px solid var(--border-dark);
   border-radius: var(--radius);
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-  width: 100%;
   max-width: 720px;
-  margin: auto;
+  width: 100%;
+  padding: 0;
   animation: modalIn 0.18s ease;
-  /* override DaisyUI modal visibility */
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  display: block !important;
-  pointer-events: auto !important;
-  transform: none !important;
-  scale: none !important;
-  overflow-y: visible !important;
-  overscroll-behavior: auto !important;
-  inset: unset !important;
 }
 
 @keyframes modalIn {
   from { opacity: 0; transform: translateY(-12px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-backdrop {
+  background: rgba(25, 15, 5, 0.6) !important;
+  backdrop-filter: blur(4px);
 }
 
 .modal-header {
@@ -567,18 +504,6 @@ input[type="checkbox"]:hover {
   color: hsl(0, 0%, 17%);
   font-family: var(--font-heading);
 }
-.modal-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.3rem;
-  line-height: 1;
-  color: var(--text-muted);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
-}
-.modal-close:hover { color: hsl(0, 0%, 17%); background: hsla(0, 0%, 50%, 0.08); }
 
 .modal-body {
   padding: 1.25rem;
@@ -587,48 +512,22 @@ input[type="checkbox"]:hover {
   overscroll-behavior: contain;
 }
 
-/* ============================================================
-   DIALOG (confirm / alert / prompt overlay)
-   ============================================================ */
-.dialog-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(25,15,5,0.65);
-  backdrop-filter: blur(4px);
+/* Dialog modal (alert / confirm / prompt) — higher z-index so it sits above other modals */
+#dialog-overlay {
   z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
 }
-.dialog-overlay.active { display: flex; }
-
-.dialog {
-  background: var(--bg-card);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+#dialog-overlay .modal-box {
   padding: 2rem;
   max-width: 440px;
-  width: 100%;
   text-align: center;
-  animation: modalIn 0.18s ease;
 }
-
-.dialog h3 {
+#dialog-overlay h3 {
   font-family: var(--font-heading);
   color: hsl(0, 0%, 17%);
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
 }
-.dialog p { color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem; }
-
-.dialog-buttons {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+#dialog-overlay p { color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem; }
 
 /* ============================================================
    QR MODAL
@@ -1096,31 +995,24 @@ input[type="checkbox"]:hover {
 .stat-block-action { font-size: 0.9rem; margin-bottom: 0.625rem; line-height: 1.55; }
 
 /* ============================================================
-   TOAST NOTIFICATION
+   TOAST (DaisyUI toast with DND styling)
    ============================================================ */
 .toast {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  background: hsl(0, 0%, 15%);
-  color: hsl(42, 38%, 93%);
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+}
+.toast .alert {
   font-family: var(--font-heading);
   font-size: 0.82rem;
   letter-spacing: 0.03em;
   padding: 0.625rem 1.125rem;
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-lift);
-  border: 1px solid rgba(255,255,255,0.15);
-  transform: translateY(200%);
-  opacity: 0;
-  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s;
-  z-index: 1100;
-  pointer-events: none;
+  min-height: unset;
 }
-.toast.show { transform: translateY(0); opacity: 1; }
 
 /* ============================================================
-   DISCONNECT BANNER (player sheet)
+   DISCONNECT BANNER (player sheet) — DaisyUI alert overrides
    ============================================================ */
 #disconnect-banner {
   font-family: var(--font-heading);
@@ -1187,23 +1079,19 @@ input[type="checkbox"]:hover {
   .stat-row { grid-template-columns: repeat(3, 1fr); }
   .form-row { grid-template-columns: 1fr; }
   .form-row-4col { grid-template-columns: 1fr 1fr; }
-  .modal-overlay {
-    padding: 0;
-    align-items: flex-end;
-  }
-  .modal-overlay .modal {
+  .modal-box {
     border-radius: var(--radius) var(--radius) 0 0 !important;
     max-height: 95dvh;
   }
   .modal-body { max-height: calc(95dvh - 6rem); }
   .coin-disc { width: 44px; height: 44px; font-size: 0.68rem; }
   .currency-tracker { gap: 0.5rem; }
-  .top-bar { gap: 0.5rem; }
+  .navbar { gap: 0.5rem; }
   /* Reduce DaisyUI card-body padding on mobile */
   .card-body { padding: 0.75rem !important; }
 }
 
 /* safe-area insets for notched phones */
 @supports (padding: env(safe-area-inset-top)) {
-  .top-bar { padding-top: max(0.625rem, env(safe-area-inset-top)); }
+  .navbar { padding-top: max(0.5rem, env(safe-area-inset-top)); }
 }

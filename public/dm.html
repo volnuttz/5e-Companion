@@ -12,205 +12,223 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <!-- ===================== SIDEBAR OVERLAY ===================== -->
-  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-  <!-- ===================== SIDEBAR ===================== -->
-  <div class="sidebar" id="sidebar" aria-label="Menu">
-    <div class="sidebar-header">
-      <span class="sidebar-title">Menu</span>
-      <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">&times;</button>
-    </div>
+  <!-- ===================== DRAWER (sidebar) ===================== -->
+  <div class="drawer drawer-end">
+    <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
 
-    <div class="sidebar-section">
-      <h3>Characters</h3>
-      <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
-      <button class="btn btn-sm sidebar-btn" onclick="document.getElementById('import-char-file').click()">
-        Import Character
-      </button>
-      <button class="btn btn-sm sidebar-btn" id="btn-export-all-chars">
-        Export Character
-      </button>
-    </div>
+    <!-- ===================== PAGE CONTENT ===================== -->
+    <div class="drawer-content">
 
-    <div class="sidebar-section">
-      <h3>Workspace</h3>
-      <button class="btn btn-sm sidebar-btn" id="btn-save-workspace" aria-label="Save Workspace">
-        Save Workspace
-      </button>
-      <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
-      <button class="btn btn-sm sidebar-btn" aria-label="Load Workspace" onclick="document.getElementById('load-workspace-file').click()">
-        Load Workspace
-      </button>
-      <button class="btn btn-sm sidebar-btn btn-danger" id="btn-clear-workspace" aria-label="Clear Workspace">
-        Clear Workspace
-      </button>
-    </div>
-  </div>
+      <!-- ===================== NAVBAR ===================== -->
+      <div class="navbar bg-neutral text-neutral-content sticky top-0 z-[200] shadow-lg border-b-2 border-primary gap-3 px-4 min-h-0 py-2">
+        <span class="top-bar-title">5.5e Companion</span>
 
-  <!-- ===================== TOP BAR ===================== -->
-  <div class="top-bar">
-    <span class="top-bar-title">5.5e Companion</span>
-
-    <div class="top-bar-search-wrap">
-      <input type="text" id="top-bar-search" class="top-bar-search" placeholder="Search compendium…" autocomplete="off">
-      <div class="top-bar-dropdown" id="top-bar-dropdown">
-        <div class="top-bar-filters">
-          <select id="compendium-category" class="select select-bordered select-sm bg-base-100 text-sm">
-            <option value="">All</option>
-            <option value="spell">Spells</option>
-            <option value="monster">Monsters</option>
-            <option value="equipment">Equipment</option>
-            <option value="feature">Features</option>
-          </select>
-          <div id="compendium-spell-filters" class="top-bar-filter-row" style="display:none;">
-            <select id="compendium-spell-level" class="select select-bordered select-sm bg-base-100 text-sm">
-              <option value="">All Levels</option>
-              <option value="0">Cantrip</option>
-              <option value="1">1st</option><option value="2">2nd</option><option value="3">3rd</option>
-              <option value="4">4th</option><option value="5">5th</option><option value="6">6th</option>
-              <option value="7">7th</option><option value="8">8th</option><option value="9">9th</option>
-            </select>
-            <select id="compendium-spell-class" class="select select-bordered select-sm bg-base-100 text-sm">
-              <option value="">All Classes</option>
-              <option value="bard">Bard</option><option value="cleric">Cleric</option>
-              <option value="druid">Druid</option><option value="paladin">Paladin</option>
-              <option value="ranger">Ranger</option><option value="sorcerer">Sorcerer</option>
-              <option value="warlock">Warlock</option><option value="wizard">Wizard</option>
-            </select>
-          </div>
-          <div id="compendium-monster-filters" class="top-bar-filter-row" style="display:none;">
-            <select id="compendium-monster-type" class="select select-bordered select-sm bg-base-100 text-sm"><option value="">All Types</option></select>
-            <select id="compendium-monster-cr" class="select select-bordered select-sm bg-base-100 text-sm"><option value="">All CR</option></select>
-          </div>
-          <div id="compendium-feature-filters" class="top-bar-filter-row" style="display:none;">
-            <select id="compendium-feature-source" class="select select-bordered select-sm bg-base-100 text-sm">
-              <option value="">All Sources</option>
-              <option value="class">Class Features</option>
-              <option value="species">Species Traits</option>
-              <option value="feat">Feats</option>
-            </select>
+        <div class="top-bar-search-wrap">
+          <input type="text" id="top-bar-search" class="input input-sm bg-neutral-focus border-neutral-content/20 text-neutral-content w-full" placeholder="Search compendium…" autocomplete="off">
+          <div class="dropdown-content top-bar-dropdown" id="top-bar-dropdown">
+            <div class="top-bar-filters">
+              <select id="compendium-category" class="select select-bordered select-sm bg-base-100 text-sm">
+                <option value="">All</option>
+                <option value="spell">Spells</option>
+                <option value="monster">Monsters</option>
+                <option value="equipment">Equipment</option>
+                <option value="feature">Features</option>
+              </select>
+              <div id="compendium-spell-filters" class="top-bar-filter-row" style="display:none;">
+                <select id="compendium-spell-level" class="select select-bordered select-sm bg-base-100 text-sm">
+                  <option value="">All Levels</option>
+                  <option value="0">Cantrip</option>
+                  <option value="1">1st</option><option value="2">2nd</option><option value="3">3rd</option>
+                  <option value="4">4th</option><option value="5">5th</option><option value="6">6th</option>
+                  <option value="7">7th</option><option value="8">8th</option><option value="9">9th</option>
+                </select>
+                <select id="compendium-spell-class" class="select select-bordered select-sm bg-base-100 text-sm">
+                  <option value="">All Classes</option>
+                  <option value="bard">Bard</option><option value="cleric">Cleric</option>
+                  <option value="druid">Druid</option><option value="paladin">Paladin</option>
+                  <option value="ranger">Ranger</option><option value="sorcerer">Sorcerer</option>
+                  <option value="warlock">Warlock</option><option value="wizard">Wizard</option>
+                </select>
+              </div>
+              <div id="compendium-monster-filters" class="top-bar-filter-row" style="display:none;">
+                <select id="compendium-monster-type" class="select select-bordered select-sm bg-base-100 text-sm"><option value="">All Types</option></select>
+                <select id="compendium-monster-cr" class="select select-bordered select-sm bg-base-100 text-sm"><option value="">All CR</option></select>
+              </div>
+              <div id="compendium-feature-filters" class="top-bar-filter-row" style="display:none;">
+                <select id="compendium-feature-source" class="select select-bordered select-sm bg-base-100 text-sm">
+                  <option value="">All Sources</option>
+                  <option value="class">Class Features</option>
+                  <option value="species">Species Traits</option>
+                  <option value="feat">Feats</option>
+                </select>
+              </div>
+            </div>
+            <div id="compendium-results" class="top-bar-results"></div>
+            <p id="compendium-hint" class="top-bar-hint">Type to search spells, monsters, equipment, features…</p>
           </div>
         </div>
-        <div id="compendium-results" class="top-bar-results"></div>
-        <p id="compendium-hint" class="top-bar-hint">Type to search spells, monsters, equipment, features…</p>
+
+        <span id="peer-status" class="text-xs opacity-60 whitespace-nowrap min-w-8 text-right" style="color:rgba(240,236,227,0.6);"></span>
+        <label for="drawer-toggle" class="btn btn-ghost btn-sm px-2" aria-label="Open menu">
+          <span class="hamburger-icon"><span></span><span></span><span></span></span>
+        </label>
       </div>
-    </div>
 
-    <span id="peer-status" class="text-xs opacity-60 whitespace-nowrap min-w-8 text-right" style="color:rgba(240,236,227,0.6);"></span>
-    <button class="hamburger-btn" id="hamburger-btn" onclick="openSidebar()" aria-label="Open menu">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
+      <!-- ===================== MAIN CONTENT ===================== -->
+      <div class="container">
 
-  <!-- ===================== MAIN CONTENT ===================== -->
-  <div class="container">
-
-    <!-- Session Bar -->
-    <div class="session-bar">
-      <div class="flex items-center gap-2">
-        <span id="session-status">No active session</span>
-      </div>
-      <div class="flex gap-2">
-        <button class="btn btn-primary btn-small" id="btn-new-session">Start Session</button>
-        <button class="btn btn-secondary btn-small" id="btn-show-qr" style="display:none;">Show QR</button>
-        <button class="btn btn-danger btn-small" id="btn-end-session" style="display:none;">End Session</button>
-      </div>
-    </div>
-
-    <!-- DM Tabs -->
-    <div class="tabs">
-      <button class="tab active" data-tab="dm-tab-characters">Characters</button>
-      <button class="tab" data-tab="dm-tab-battlefield">Battlefield</button>
-      <button class="tab" data-tab="dm-tab-treasures">Treasures</button>
-      <button class="tab" data-tab="dm-tab-shops">Shops</button>
-      <button class="tab" data-tab="dm-tab-notes">Notes</button>
-    </div>
-
-    <!-- ── CHARACTERS TAB ── -->
-    <div class="tab-content active" id="dm-tab-characters">
-      <div class="card card-compact bg-base-100 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-end mb-3">
-            <button class="btn btn-primary btn-small" id="btn-add-char">+ New Character</button>
+        <!-- Session Bar -->
+        <div class="session-bar">
+          <div class="flex items-center gap-2">
+            <span id="session-status">No active session</span>
           </div>
-          <div id="char-list"></div>
+          <div class="flex gap-2">
+            <button class="btn btn-primary btn-small" id="btn-new-session">Start Session</button>
+            <button class="btn btn-secondary btn-small" id="btn-show-qr" style="display:none;">Show QR</button>
+            <button class="btn btn-danger btn-small" id="btn-end-session" style="display:none;">End Session</button>
+          </div>
+        </div>
+
+        <!-- DM Tabs -->
+        <div role="tablist" class="tabs tabs-bordered">
+          <button role="tab" class="tab tab-active" data-tab="dm-tab-characters">Characters</button>
+          <button role="tab" class="tab" data-tab="dm-tab-battlefield">Battlefield</button>
+          <button role="tab" class="tab" data-tab="dm-tab-treasures">Treasures</button>
+          <button role="tab" class="tab" data-tab="dm-tab-shops">Shops</button>
+          <button role="tab" class="tab" data-tab="dm-tab-notes">Notes</button>
+        </div>
+
+        <!-- ── CHARACTERS TAB ── -->
+        <div class="tab-content active" id="dm-tab-characters">
+          <div class="card card-compact bg-base-100 shadow-md">
+            <div class="card-body">
+              <div class="flex justify-end mb-3">
+                <button class="btn btn-primary btn-small" id="btn-add-char">+ New Character</button>
+              </div>
+              <div id="char-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── BATTLEFIELD TAB ── -->
+        <div class="tab-content" id="dm-tab-battlefield">
+          <div class="card card-compact bg-base-100 shadow-md">
+            <div class="card-body">
+              <div class="flex justify-end gap-2 mb-3">
+                <button class="btn btn-primary btn-small" id="btn-add-monsters">Add Monsters</button>
+                <button class="btn btn-secondary btn-small" onclick="addCustomMonster()">+ Add Custom</button>
+              </div>
+              <div id="battlefield-list"></div>
+              <div id="bf-characters-list"></div>
+              <p id="battlefield-empty" style="color:var(--text-muted);font-size:0.9rem;">No monsters on the battlefield.</p>
+              <p id="bf-characters-empty" style="color:var(--text-muted);font-size:0.9rem;">No active session. Start a session to track character HP.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TREASURES TAB ── -->
+        <div class="tab-content" id="dm-tab-treasures">
+          <div class="card card-compact bg-base-100 shadow-md">
+            <div class="card-body">
+              <div class="flex justify-end gap-2 mb-3">
+                <button class="btn btn-primary btn-small" id="btn-add-items">Add Items</button>
+                <button class="btn btn-secondary btn-small" onclick="addCustomTreasure()">+ Add Custom</button>
+              </div>
+              <div id="treasure-list"></div>
+              <p id="treasure-empty" style="color:var(--text-muted);font-size:0.9rem;">No items in the treasure pool.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── SHOPS TAB ── -->
+        <div class="tab-content" id="dm-tab-shops">
+          <div class="card card-compact bg-base-100 shadow-md">
+            <div class="card-body">
+              <div class="flex justify-end mb-3">
+                <button class="btn btn-primary btn-small" id="btn-create-shop">+ New Shop</button>
+              </div>
+              <p id="shops-empty" style="color:var(--text-muted);font-size:0.9rem;">No shops created. Click "+ New Shop" to get started.</p>
+              <div id="shops-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── NOTES TAB ── -->
+        <div class="tab-content" id="dm-tab-notes">
+          <div class="card card-compact bg-base-100 shadow-md">
+            <div class="card-body">
+              <div class="flex justify-end mb-3">
+                <span id="notes-save-status" style="font-size:0.8rem;color:var(--text-muted);font-style:italic;"></span>
+              </div>
+              <textarea
+                id="notes-editor"
+                placeholder="Write your session notes here…"
+                class="textarea textarea-bordered w-full"
+                style="min-height:500px;font-family:var(--font-body);font-size:1rem;resize:vertical;line-height:1.6;"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.container -->
+
+      <!-- SRD Footer -->
+      <footer class="srd-footer">
+        <p>This app uses content from the <em>Systems Reference Document 5.2</em> by Wizards of the Coast LLC, licensed under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</p>
+        <p>This app is not affiliated with, endorsed, sponsored, or approved by Wizards of the Coast LLC.</p>
+      </footer>
+
+    </div><!-- /.drawer-content -->
+
+    <!-- ===================== DRAWER SIDE (sidebar) ===================== -->
+    <div class="drawer-side z-[300]">
+      <label for="drawer-toggle" aria-label="Close menu" class="drawer-overlay"></label>
+      <div class="menu-sidebar bg-neutral text-neutral-content min-h-full w-72" aria-label="Menu">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Menu</span>
+          <button class="btn btn-ghost btn-sm text-neutral-content/60" onclick="closeSidebar()" aria-label="Close menu">✕</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Characters</h3>
+          <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
+          <button class="btn btn-sm sidebar-btn" onclick="document.getElementById('import-char-file').click()">
+            Import Character
+          </button>
+          <button class="btn btn-sm sidebar-btn" id="btn-export-all-chars">
+            Export Character
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Workspace</h3>
+          <button class="btn btn-sm sidebar-btn" id="btn-save-workspace" aria-label="Save Workspace">
+            Save Workspace
+          </button>
+          <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
+          <button class="btn btn-sm sidebar-btn" aria-label="Load Workspace" onclick="document.getElementById('load-workspace-file').click()">
+            Load Workspace
+          </button>
+          <button class="btn btn-sm sidebar-btn btn-danger" id="btn-clear-workspace" aria-label="Clear Workspace">
+            Clear Workspace
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- ── BATTLEFIELD TAB ── -->
-    <div class="tab-content" id="dm-tab-battlefield">
-      <div class="card card-compact bg-base-100 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-end gap-2 mb-3">
-            <button class="btn btn-primary btn-small" id="btn-add-monsters">Add Monsters</button>
-            <button class="btn btn-secondary btn-small" onclick="addCustomMonster()">+ Add Custom</button>
-          </div>
-          <div id="battlefield-list"></div>
-          <div id="bf-characters-list"></div>
-          <p id="battlefield-empty" style="color:var(--text-muted);font-size:0.9rem;">No monsters on the battlefield.</p>
-          <p id="bf-characters-empty" style="color:var(--text-muted);font-size:0.9rem;">No active session. Start a session to track character HP.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── TREASURES TAB ── -->
-    <div class="tab-content" id="dm-tab-treasures">
-      <div class="card card-compact bg-base-100 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-end gap-2 mb-3">
-            <button class="btn btn-primary btn-small" id="btn-add-items">Add Items</button>
-            <button class="btn btn-secondary btn-small" onclick="addCustomTreasure()">+ Add Custom</button>
-          </div>
-          <div id="treasure-list"></div>
-          <p id="treasure-empty" style="color:var(--text-muted);font-size:0.9rem;">No items in the treasure pool.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── SHOPS TAB ── -->
-    <div class="tab-content" id="dm-tab-shops">
-      <div class="card card-compact bg-base-100 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-end mb-3">
-            <button class="btn btn-primary btn-small" id="btn-create-shop">+ New Shop</button>
-          </div>
-          <p id="shops-empty" style="color:var(--text-muted);font-size:0.9rem;">No shops created. Click "+ New Shop" to get started.</p>
-          <div id="shops-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── NOTES TAB ── -->
-    <div class="tab-content" id="dm-tab-notes">
-      <div class="card card-compact bg-base-100 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-end mb-3">
-            <span id="notes-save-status" style="font-size:0.8rem;color:var(--text-muted);font-style:italic;"></span>
-          </div>
-          <textarea
-            id="notes-editor"
-            placeholder="Write your session notes here…"
-            class="textarea textarea-bordered w-full"
-            style="min-height:500px;font-family:var(--font-body);font-size:1rem;resize:vertical;line-height:1.6;"
-          ></textarea>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /.container -->
+  </div><!-- /.drawer -->
 
   <!-- ============================================================
-       MODALS (div-based, JS toggles .active class)
+       MODALS (DaisyUI <dialog>, JS uses .showModal() / .close())
        ============================================================ -->
 
   <!-- QR Code Modal -->
-  <div class="modal-overlay" id="qr-modal">
-    <div class="modal" style="max-width:420px;text-align:center;">
+  <dialog id="qr-modal" class="modal">
+    <div class="modal-box" style="max-width:420px;text-align:center;">
       <div class="modal-header">
         <h2>Session QR Code</h2>
-        <button class="modal-close" onclick="document.getElementById('qr-modal').classList.remove('active')" aria-label="Close">&times;</button>
+        <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('qr-modal').close()">✕</button>
       </div>
       <div class="qr-container modal-body">
         <canvas id="qr-canvas"></canvas>
@@ -221,25 +239,27 @@
         </div>
       </div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- Compendium Detail Modal -->
-  <div class="modal-overlay" id="compendium-modal">
-    <div class="modal">
+  <dialog id="compendium-modal" class="modal">
+    <div class="modal-box">
       <div class="modal-header">
         <h2 id="compendium-modal-title"></h2>
-        <button class="modal-close" onclick="document.getElementById('compendium-modal').classList.remove('active')" aria-label="Close">&times;</button>
+        <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('compendium-modal').close()">✕</button>
       </div>
       <div id="compendium-modal-body" class="modal-body"></div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- Character Edit Modal -->
-  <div class="modal-overlay" id="char-modal">
-    <div class="modal" style="max-width:760px;">
+  <dialog id="char-modal" class="modal">
+    <div class="modal-box" style="max-width:760px;">
       <div class="modal-header">
         <h2 id="char-modal-title">New Character</h2>
-        <button class="modal-close" onclick="closeCharModal()" aria-label="Close">&times;</button>
+        <button class="btn btn-sm btn-circle btn-ghost" onclick="closeCharModal()">✕</button>
       </div>
       <form id="char-form" class="modal-body">
         <input type="hidden" id="char-edit-id">
@@ -371,14 +391,15 @@
         </div>
       </form>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- Add Monsters Modal -->
-  <div class="modal-overlay" id="monster-search-modal">
-    <div class="modal">
+  <dialog id="monster-search-modal" class="modal">
+    <div class="modal-box">
       <div class="modal-header">
         <h2>Add Monsters</h2>
-        <button class="modal-close" onclick="document.getElementById('monster-search-modal').classList.remove('active')" aria-label="Close">&times;</button>
+        <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('monster-search-modal').close()">✕</button>
       </div>
       <div class="modal-body">
         <div class="search-bar">
@@ -389,25 +410,27 @@
         <div id="monster-results" class="list-section" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
       </div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- Monster Stat Block Modal -->
-  <div class="modal-overlay" id="monster-modal">
-    <div class="modal">
+  <dialog id="monster-modal" class="modal">
+    <div class="modal-box">
       <div class="modal-header">
         <h2 id="monster-modal-title">Monster</h2>
-        <button class="modal-close" onclick="document.getElementById('monster-modal').classList.remove('active')" aria-label="Close">&times;</button>
+        <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('monster-modal').close()">✕</button>
       </div>
       <div id="monster-stat-block" class="modal-body"></div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- Add Items (Treasure) Modal -->
-  <div class="modal-overlay" id="treasure-search-modal">
-    <div class="modal">
+  <dialog id="treasure-search-modal" class="modal">
+    <div class="modal-box">
       <div class="modal-header">
         <h2>Add Items</h2>
-        <button class="modal-close" onclick="document.getElementById('treasure-search-modal').classList.remove('active')" aria-label="Close">&times;</button>
+        <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('treasure-search-modal').close()">✕</button>
       </div>
       <div class="modal-body">
         <div class="search-bar">
@@ -422,14 +445,15 @@
         <div id="treasure-results" class="list-section" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
       </div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- Shop Item Search Modal -->
-  <div class="modal-overlay" id="shop-search-modal">
-    <div class="modal">
+  <dialog id="shop-search-modal" class="modal">
+    <div class="modal-box">
       <div class="modal-header">
         <h2>Add Shop Items</h2>
-        <button class="modal-close" onclick="document.getElementById('shop-search-modal').classList.remove('active')" aria-label="Close">&times;</button>
+        <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('shop-search-modal').close()">✕</button>
       </div>
       <div class="modal-body">
         <div class="search-bar">
@@ -444,35 +468,30 @@
         <div id="shop-item-results" class="list-section" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
       </div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
 
   <!-- Generic Dialog Modal (alert / confirm / prompt) -->
-  <div class="dialog-overlay" id="dialog-overlay">
-    <div class="dialog">
-      <h3 id="dialog-title"></h3>
-      <p id="dialog-message"></p>
-      <div class="dialog-buttons" id="dialog-buttons"></div>
+  <dialog id="dialog-overlay" class="modal">
+    <div class="modal-box max-w-md text-center">
+      <h3 class="font-bold text-lg" id="dialog-title"></h3>
+      <p class="py-2" id="dialog-message"></p>
+      <div class="modal-action justify-center" id="dialog-buttons"></div>
     </div>
+  </dialog>
+
+  <!-- Toast (DaisyUI) -->
+  <div class="toast toast-end z-[1100]" id="toast-container" style="display:none;">
+    <div class="alert bg-neutral text-neutral-content border-neutral-content/15 shadow-lg" id="toast"></div>
   </div>
-
-  <!-- SRD Footer -->
-  <footer class="srd-footer">
-    <p>This app uses content from the <em>Systems Reference Document 5.2</em> by Wizards of the Coast LLC, licensed under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</p>
-    <p>This app is not affiliated with, endorsed, sponsored, or approved by Wizards of the Coast LLC.</p>
-  </footer>
-
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
 
   <!-- Sidebar JS -->
   <script>
     function openSidebar() {
-      document.getElementById('sidebar').classList.add('open');
-      document.getElementById('sidebar-overlay').classList.add('active');
+      document.getElementById('drawer-toggle').checked = true;
     }
     function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('sidebar-overlay').classList.remove('active');
+      document.getElementById('drawer-toggle').checked = false;
     }
   </script>
 
