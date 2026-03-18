@@ -1,6 +1,6 @@
 # 5.5e Companion
 
-A web app for tabletop D&D 5.5e sessions. DMs manage characters and track battlefield encounters, while players view their character sheets in real time via QR code + PIN.
+A web app for tabletop 5.5e sessions. DMs manage characters and track battlefield encounters, while players view their character sheets in real time via QR code + PIN.
 
 ## Features
 
@@ -29,7 +29,7 @@ A web app for tabletop D&D 5.5e sessions. DMs manage characters and track battle
 
    ```bash
    git clone <repo-url>
-   cd dnd
+   cd 5.5e-Companion
    ```
 
 2. **Install dependencies**
