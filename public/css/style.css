@@ -92,11 +92,11 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  color: var(--accent);
+  color: hsl(0, 0%, 17%);
 }
 
-a { color: var(--accent); }
-a:hover { color: var(--accent-hover); }
+a { color: hsl(0, 0%, 25%); }
+a:hover { color: hsl(0, 0%, 10%); }
 
 /* ============================================================
    BUTTON OVERRIDES (DaisyUI btn + our custom variants)
@@ -105,6 +105,32 @@ a:hover { color: var(--accent-hover); }
   font-family: var(--font-heading);
   letter-spacing: 0.04em;
   border-radius: 0.375rem;
+}
+
+/* Primary button: dark red D&D theme */
+.btn.btn-primary,
+button.btn-primary {
+  background-color: hsl(0, 45%, 28%) !important;
+  border-color: hsl(0, 45%, 24%) !important;
+  color: #fff !important;
+}
+.btn.btn-primary:hover,
+button.btn-primary:hover {
+  background-color: hsl(0, 45%, 35%) !important;
+  border-color: hsl(0, 45%, 30%) !important;
+}
+
+/* Secondary button: warm gray */
+.btn.btn-secondary,
+button.btn-secondary {
+  background-color: hsl(40, 10%, 40%) !important;
+  border-color: hsl(40, 10%, 35%) !important;
+  color: #fff !important;
+}
+.btn.btn-secondary:hover,
+button.btn-secondary:hover {
+  background-color: hsl(40, 10%, 48%) !important;
+  border-color: hsl(40, 10%, 42%) !important;
 }
 
 /* .btn-danger is our existing name; map to DaisyUI error colors */
@@ -170,7 +196,7 @@ button.btn-small {
   position: sticky;
   top: 0;
   z-index: 200;
-  background: hsl(220, 22%, 18%);
+  background: hsl(0, 45%, 22%);
   color: hsl(42, 38%, 93%);
   display: flex;
   align-items: center;
@@ -285,7 +311,7 @@ button.btn-small {
   left: -300px;
   width: 275px;
   height: 100dvh;
-  background: hsl(220, 22%, 14%);
+  background: hsl(0, 45%, 18%);
   color: hsl(42, 38%, 93%);
   z-index: 400;
   transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -397,11 +423,11 @@ button.btn-small {
   height: auto !important;
   min-height: unset !important;
 }
-.tab:hover { color: var(--accent) !important; background: hsla(0, 51%, 36%, 0.06) !important; }
+.tab:hover { color: hsl(0, 0%, 17%) !important; background: hsla(0, 0%, 50%, 0.06) !important; }
 .tab.active {
-  color: var(--accent) !important;
-  border-bottom-color: var(--accent) !important;
-  background: hsla(0, 51%, 36%, 0.06) !important;
+  color: hsl(0, 0%, 17%) !important;
+  border-bottom-color: hsl(0, 0%, 17%) !important;
+  background: hsla(0, 0%, 50%, 0.06) !important;
   font-weight: 700;
 }
 
@@ -464,7 +490,7 @@ button.btn-small {
 .modal-header h2 {
   margin: 0;
   font-size: 1.15rem;
-  color: var(--accent);
+  color: hsl(0, 0%, 17%);
   font-family: var(--font-heading);
 }
 .modal-close {
@@ -478,7 +504,7 @@ button.btn-small {
   border-radius: 4px;
   transition: color 0.15s, background 0.15s;
 }
-.modal-close:hover { color: var(--accent); background: hsla(0,51%,36%,0.08); }
+.modal-close:hover { color: hsl(0, 0%, 17%); background: hsla(0, 0%, 50%, 0.08); }
 
 .modal-body {
   padding: 1.25rem;
@@ -523,7 +549,7 @@ button.btn-small {
 }
 .dialog h3 {
   font-family: var(--font-heading);
-  color: var(--accent);
+  color: hsl(0, 0%, 17%);
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
 }
@@ -586,8 +612,8 @@ button.btn-small {
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px hsla(0, 51%, 36%, 0.18);
+  border-color: hsl(0, 0%, 40%);
+  box-shadow: 0 0 0 2px hsla(0, 0%, 40%, 0.18);
 }
 .form-group input::placeholder { color: var(--text-muted); opacity: 0.5; }
 
@@ -608,7 +634,7 @@ button.btn-small {
   font-family: var(--font-heading);
   font-size: 0.75rem;
   letter-spacing: 0.1em;
-  color: var(--accent);
+  color: hsl(0, 0%, 30%);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -636,7 +662,7 @@ button.btn-small {
 }
 .search-bar input { flex: 1; min-width: 140px; }
 .search-bar input:focus, .search-bar select:focus {
-  border-color: var(--accent);
+  border-color: hsl(0, 0%, 40%);
 }
 
 /* Inline list-section (search results within modal) */
@@ -654,7 +680,8 @@ button.btn-small {
    LIST ITEMS (search results, feature/spell/equip rows)
    ============================================================ */
 .list-item {
-  display: flex;
+  display: flex !important;
+  list-style: none !important;
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 0.875rem;
@@ -686,7 +713,7 @@ button.btn-small {
   transition: border-left-color 0.15s, box-shadow 0.15s, transform 0.1s;
 }
 .char-item:hover {
-  border-left-color: var(--accent);
+  border-left-color: hsl(0, 0%, 30%);
   box-shadow: var(--shadow-md);
   transform: translateX(2px);
 }
@@ -801,14 +828,14 @@ button.btn-small {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .stat-box:hover {
-  border-color: var(--accent);
+  border-color: hsl(0, 0%, 40%);
   box-shadow: var(--shadow-sm);
 }
 .stat-label {
   font-family: var(--font-heading);
   font-size: 0.68rem;
   font-weight: 700;
-  color: var(--accent);
+  color: hsl(0, 0%, 30%);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   display: block;
@@ -847,7 +874,7 @@ button.btn-small {
 }
 .skill-mod {
   font-weight: 700;
-  color: var(--accent);
+  color: hsl(0, 0%, 17%);
   min-width: 2rem;
   text-align: right;
   font-family: var(--font-heading);
@@ -878,7 +905,7 @@ button.btn-small {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--accent);
+  color: hsl(0, 0%, 30%);
   font-weight: 700;
   margin-bottom: 0.25rem;
   display: block;
@@ -906,7 +933,7 @@ button.btn-small {
 .item-card h4 {
   font-family: var(--font-heading);
   font-size: 0.95rem;
-  color: var(--accent);
+  color: hsl(0, 0%, 17%);
   margin-bottom: 0.25rem;
 }
 .item-card .meta { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.35rem; }
@@ -931,15 +958,15 @@ button.btn-small {
   display: inline-block;
   width: 28px;
   height: 28px;
-  border: 2px solid var(--accent);
+  border: 2px solid hsl(0, 0%, 30%);
   border-radius: 50%;
   background: transparent;
   transition: background 0.18s, box-shadow 0.18s;
   vertical-align: middle;
 }
 .slot-bubble input:checked + .slot-circle {
-  background: var(--accent);
-  box-shadow: 0 0 7px hsla(0, 51%, 36%, 0.55);
+  background: hsl(0, 0%, 30%);
+  box-shadow: 0 0 7px hsla(0, 0%, 30%, 0.55);
 }
 
 /* ============================================================
@@ -985,7 +1012,7 @@ button.btn-small {
    ============================================================ */
 .stat-block-divider {
   height: 1px;
-  background: var(--accent);
+  background: hsl(0, 0%, 40%);
   margin: 0.625rem 0;
   opacity: 0.35;
 }
@@ -1000,7 +1027,7 @@ button.btn-small {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  background: hsl(220, 22%, 18%);
+  background: hsl(0, 45%, 22%);
   color: hsl(42, 38%, 93%);
   font-family: var(--font-heading);
   font-size: 0.82rem;
@@ -1040,8 +1067,8 @@ button.btn-small {
   text-align: center;
   line-height: 1.5;
 }
-.srd-footer a { color: var(--accent); text-decoration: none; }
-.srd-footer a:hover { color: var(--accent-hover); }
+.srd-footer a { color: hsl(0, 0%, 30%); text-decoration: none; }
+.srd-footer a:hover { color: hsl(0, 0%, 10%); }
 
 /* ============================================================
    DIALOG ICON COLORS (JS sets .dialog-icon.warn / .info / etc.)
@@ -1066,7 +1093,7 @@ button.btn-small {
    ============================================================ */
 #step-join h2, #step-pick h2 {
   font-family: var(--font-heading);
-  color: var(--accent);
+  color: hsl(0, 0%, 17%);
   margin-bottom: 1rem;
 }
 
