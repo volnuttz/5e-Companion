@@ -1109,6 +1109,8 @@ async function loadCharacters() {
   const chars = await db.getAllCharacters();
   allCharacters = chars;
   renderCharacterList(chars);
+  renderTreasures();
+  renderShops();
 }
 
 function renderCharacterList(chars) {
