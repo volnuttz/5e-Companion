@@ -1989,9 +1989,9 @@ function buildMonsterStatBlockHTML(m) {
     <div class="stat-block-line"><strong>HP</strong> ${m.HP}${m.hitDice ? ' (' + m.hitDice + ')' : ''}</div>
     <div class="stat-block-line"><strong>Speed</strong> ${m.speed || '30 ft.'}</div>
     <div class="stat-block-divider"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;">
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0;">
       ${['STR','DEX','CON','INT','WIS','CHA'].map(a => `
-        <div class="stat-box" style="min-width:55px;">
+        <div class="stat-box" style="padding:0.5rem 0.15rem;">
           <div class="stat-label">${a}</div>
           <div class="stat-mod" style="font-size:1.1rem;">${abilityMod(m[a] || 10)}</div>
           <div class="stat-value" style="font-size:0.85rem;">${m[a] || 10}</div>

@@ -594,8 +594,8 @@ input[type="checkbox"]:not(.collapse > input):hover {
 }
 .form-row-4col { grid-template-columns: repeat(4, 1fr); }
 .stat-row { grid-template-columns: repeat(6, 1fr); }
-.currency-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-.currency-row .form-group { flex: 1; min-width: 58px; }
+.currency-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+
 
 .section-divider {
   text-align: center;
