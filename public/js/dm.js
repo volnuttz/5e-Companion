@@ -539,7 +539,7 @@ function filterSpells() {
             ${sp.level === 0 ? 'Cantrip' : 'Level ' + sp.level} ${esc(sp.school)}
           </span>
         </div>
-        <span class="badge badge-sm badge-ghost">${sp.classes.join(', ')}</span>
+        <span class="spell-classes-badge">${sp.classes.map(c => c.slice(0,3).toUpperCase()).join(' ')}</span>
       </div>
     `).join('');
   }
@@ -929,7 +929,7 @@ function addEquipmentRow(data) {
   div.className = 'list-item';
   div.style.cssText = 'display:block;padding:10px 12px;';
   div.innerHTML = `
-    <div class="eq-item-grid" style="display:grid;grid-template-columns:2fr 1fr 56px auto;gap:6px;align-items:end;margin-bottom:8px;">
+    <div class="eq-item-grid">
       <div class="form-group" style="margin-bottom:0;"><label>Name</label><input type="text" class="input input-bordered input-sm eq-name" value="${esc(data?.name || '')}"></div>
       <div class="form-group" style="margin-bottom:0;"><label>Type</label><input type="text" class="input input-bordered input-sm eq-type" value="${esc(data?.type || '')}"></div>
       <div class="form-group" style="margin-bottom:0;"><label>Qty</label><input type="number" class="input input-bordered input-sm eq-qty" value="${data?.quantity || 1}" min="0"></div>

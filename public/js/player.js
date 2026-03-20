@@ -409,14 +409,13 @@ function renderCharacterSheet(c, hpState) {
 
   const currencyHtml = `
     <h3>Purse</h3>
-    <div class="currency-tracker">
-      ${coinDefs.map(({ key, cls, name }) => {
+    <div class="purse-grid">
+      ${coinDefs.map(({ key }) => {
         const amount = cur[key] || 0;
         return `
-        <div class="coin-group${amount === 0 ? ' zero' : ''}">
-          <div class="coin-disc ${cls}">${key}</div>
-          <span class="coin-amount">${amount}</span>
-          <span class="coin-name">${name}</span>
+        <div class="purse-item${amount === 0 ? ' zero' : ''}">
+          <span class="purse-amount-val">${amount}</span>
+          <span class="purse-abbr">${key}</span>
         </div>`;
       }).join('')}
     </div>

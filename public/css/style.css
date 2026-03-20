@@ -787,6 +787,25 @@ input[type="checkbox"]:not(.collapse > input):hover {
 .spell-result-item { transition: background 0.12s; }
 .spell-result-item:hover { background: hsla(0, 0%, 90%, 0.7); }
 
+/* Spell class abbreviation badge in search results */
+.spell-classes-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+/* Equipment item grid (character creation / edit forms) */
+.eq-item-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 56px auto;
+  gap: 6px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
 /* ============================================================
    CHARACTER LIST
    ============================================================ */
@@ -1060,42 +1079,41 @@ input[type="checkbox"]:not(.collapse > input):hover {
 }
 
 /* ============================================================
-   CURRENCY / COIN DISCS
+   CURRENCY / PURSE
    ============================================================ */
-.currency-tracker { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.coin-group { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-.coin-group.zero { opacity: 0.4; }
-
-.coin-disc {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+.purse-grid {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-heading);
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
-  box-shadow:
-    inset 0 2px 4px rgba(255,255,255,0.25),
-    inset 0 -2px 4px rgba(0,0,0,0.25),
-    0 2px 8px rgba(0,0,0,0.2);
-  border: 2px solid rgba(255,255,255,0.2);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
-.coin-disc.cp { background: radial-gradient(circle at 35% 35%, #d4956a, #8b4513 70%); }
-.coin-disc.sp { background: radial-gradient(circle at 35% 35%, #e8e8e8, #9e9e9e 70%); color: rgba(0,0,0,0.7); }
-.coin-disc.ep { background: radial-gradient(circle at 35% 35%, #bfd6e8, #6a9fc0 70%); }
-.coin-disc.gp { background: radial-gradient(circle at 35% 35%, #ffd84d, #b8860b 70%); color: rgba(0,0,0,0.75); }
-.coin-disc.pp { background: radial-gradient(circle at 35% 35%, #e8e8f0, #a0a0c0 70%); color: rgba(0,0,0,0.7); }
-
-.coin-amount {
+.purse-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-width: 52px;
+  gap: 0.1rem;
+}
+.purse-item.zero { opacity: 0.4; }
+.purse-amount-val {
   font-family: var(--font-heading);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
+  line-height: 1.2;
 }
-.coin-name { font-size: 0.7rem; color: var(--text-muted); }
+.purse-abbr {
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 
 /* ============================================================
    MONSTER STAT BLOCK
@@ -1222,13 +1240,11 @@ input[type="checkbox"]:not(.collapse > input):hover {
   }
   /* Equipment row: Name spans full width, Type + Qty + Remove on next row */
   .eq-item-grid {
-    grid-template-columns: 1fr 56px auto !important;
+    grid-template-columns: 1fr 56px auto;
   }
   .eq-item-grid > .form-group:first-child {
     grid-column: 1 / -1;
   }
-  .coin-disc { width: 44px; height: 44px; font-size: 0.68rem; }
-  .currency-tracker { gap: 0.5rem; }
   .navbar { gap: 0.5rem; }
   /* Reduce DaisyUI card-body padding on mobile */
   .card-body { padding: 0.75rem !important; }
