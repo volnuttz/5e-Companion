@@ -627,10 +627,10 @@ function renderSavingThrows() {
   container.innerHTML = ABILITIES.map((a, i) => {
     const proficient = classSaves.includes(a);
     return `
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;min-height:44px;">
         <span style="color:var(--accent);font-weight:600;min-width:14px;">${proficient ? '*' : ''}</span>
         <span style="flex:1;font-size:0.9rem;font-weight:500;">${a}</span>
-        <span id="f-save-mod-${i}" class="ability-mod-badge" style="min-width:32px;text-align:center;">+0</span>
+        <span id="f-save-mod-${i}" class="ability-mod-badge" style="min-width:36px;text-align:center;">+0</span>
       </div>`;
   }).join('');
   updateSavingThrows();
@@ -659,11 +659,11 @@ function renderSkillInputs(proficiencies) {
   container.innerHTML = SKILL_ABILITIES.map((s, i) => {
     const checked = proficiencies && proficiencies[i] ? 'checked' : '';
     return `
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;min-height:44px;">
         <input type="checkbox" id="f-skill-prof-${i}" ${checked} onchange="updateSkillModifiers()">
         <span style="flex:1;font-size:0.9rem;font-weight:500;">${s.name}</span>
-        <span style="color:var(--text-muted);font-size:0.72rem;">${s.ability}</span>
-        <span id="f-skill-mod-${i}" class="ability-mod-badge" style="min-width:32px;text-align:center;">+0</span>
+        <span style="color:var(--text-muted);font-size:0.75rem;white-space:nowrap;">${s.ability}</span>
+        <span id="f-skill-mod-${i}" class="ability-mod-badge" style="min-width:36px;text-align:center;">+0</span>
       </div>`;
   }).join('');
   updateSkillModifiers();

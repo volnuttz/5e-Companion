@@ -682,7 +682,9 @@ input[type="checkbox"]:not(.collapse > input):hover {
   font-weight: 600;
   color: var(--text);
   padding: 0.75rem 1rem;
-  min-height: unset;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
 }
 .char-form-collapse .collapse-title::after {
   color: var(--text-muted);
@@ -691,6 +693,18 @@ input[type="checkbox"]:not(.collapse > input):hover {
   padding: 0.75rem 1rem 1rem;
   background: var(--bg-card);
   border-top: 1px solid var(--border);
+}
+
+/* Skill / Save check grids */
+.skill-check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.save-check-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
 
 /* DaisyUI divider styling for form sections */
@@ -1189,9 +1203,22 @@ input[type="checkbox"]:not(.collapse > input):hover {
     max-height: calc(95dvh - 6rem);
     padding: 0.75rem 0.875rem;
   }
-  /* Reduce horizontal padding inside collapsibles so content has more room */
+  /* More breathing room inside collapsibles on small screens */
   .char-form-collapse .collapse-content {
-    padding: 0.625rem 0.625rem 0.75rem;
+    padding: 0.75rem 0.75rem 1rem;
+  }
+  /* Collapsible header touch target */
+  .char-form-collapse .collapse-title {
+    min-height: 52px;
+    font-size: 1rem;
+  }
+  /* Skills: single column so names don't wrap or get clipped */
+  .skill-check-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Saving throws: 2 columns fits better on narrow phones */
+  .save-check-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   /* Equipment row: Name spans full width, Type + Qty + Remove on next row */
   .eq-item-grid {
