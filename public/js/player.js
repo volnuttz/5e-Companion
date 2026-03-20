@@ -466,9 +466,11 @@ function renderCharacterSheet(c, hpState) {
     // Spell slots
     const slotInfo = getSpellSlots(c.class, c.level);
     if (slotInfo.type === 'pact') {
+      const slotSummary = `Pact Magic: ${slotInfo.slots} slot${slotInfo.slots > 1 ? 's' : ''} at level ${slotInfo.slotLevel}`;
       spellSlotsEl.innerHTML = `
         <div class="item-card" style="margin-bottom:16px;">
           <h4>Pact Magic <span style="font-size:0.8rem;font-weight:normal;color:var(--text-muted);">(recharge on short rest)</span></h4>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">${slotSummary}</div>
           <div style="display:flex;gap:6px;align-items:center;margin-top:8px;">
             <span class="stat-label" style="margin:0;">Level ${slotInfo.slotLevel}</span>
             ${Array.from({length: slotInfo.slots}, (_, j) => {
@@ -484,8 +486,10 @@ function renderCharacterSheet(c, hpState) {
         </div>
       `;
     } else if (slotInfo.slots.length > 0) {
+      const slotSummary = 'Spell slots: ' + slotInfo.slots.map((n, i) => `L${i + 1}: ${n}`).join(' · ');
       spellSlotsEl.innerHTML = `
         <div style="margin-bottom:16px;">
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">${slotSummary}</div>
           ${slotInfo.slots.map((count, i) => `
             <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
               <span class="stat-label" style="min-width:32px;margin:0;">${i + 1}${ordinal(i + 1)}</span>

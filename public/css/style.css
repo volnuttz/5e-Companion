@@ -1143,6 +1143,9 @@ input[type="checkbox"]:not(.collapse > input):hover {
   letter-spacing: 0.03em;
   padding: 0.625rem 1.125rem;
   min-height: unset;
+  background-color: hsl(0, 0%, 22%);
+  color: hsl(0, 0%, 95%);
+  border-color: hsl(0, 0%, 35%);
 }
 
 /* ============================================================
