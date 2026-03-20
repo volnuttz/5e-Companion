@@ -667,12 +667,15 @@ async function openLevelUpModal(charId) {
         ${ABILITIES.map(a => `<div style="text-align:center;">
           <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);font-family:var(--font-heading);">${a} (${c[a]})</div>
           <div style="display:flex;gap:2px;margin-top:2px;">
-            <button type="button" class="hp-btn hp-btn-sm" onclick="levelUpASI('${charId}','${a}',1)">+1</button>
-            <button type="button" class="hp-btn hp-btn-sm" onclick="levelUpASI('${charId}','${a}',2)">+2</button>
+            <button type="button" class="hp-btn hp-btn-sm" data-asi="${a}" data-amount="1" onclick="levelUpASI('${charId}','${a}',1)">+1</button>
+            <button type="button" class="hp-btn hp-btn-sm" data-asi="${a}" data-amount="2" onclick="levelUpASI('${charId}','${a}',2)">+2</button>
           </div>
         </div>`).join('')}
       </div>
-      <div id="asi-pending" style="margin-top:6px;font-size:0.85rem;color:var(--text-muted);"></div>
+      <div id="asi-pending" style="margin-top:6px;font-size:0.85rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
+        <span></span>
+        <button type="button" class="btn btn-secondary btn-small" onclick="resetASI()" style="display:none;font-size:0.75rem;padding:2px 8px;" id="asi-reset-btn">Reset</button>
+      </div>
     </div>`;
   }
 
@@ -719,17 +722,52 @@ function levelUpAvgHP(charId, avgHP) {
 
 function levelUpASI(charId, ability, amount) {
   const pending = window._levelUpPending;
-  const totalUsed = Object.values(pending.asiChanges).reduce((s, v) => s + v, 0);
-  if (totalUsed + amount > 2) {
-    showToast('ASI limit: 2 points total');
-    return;
+
+  // Toggle: clicking the same ability+amount removes it
+  if (pending.asiChanges[ability] === amount) {
+    delete pending.asiChanges[ability];
+  } else {
+    // Remove existing assignment for this ability before setting new one
+    const currentForAbility = pending.asiChanges[ability] || 0;
+    const totalUsed = Object.values(pending.asiChanges).reduce((s, v) => s + v, 0) - currentForAbility;
+    if (totalUsed + amount > 2) {
+      showToast('ASI limit: 2 points total');
+      return;
+    }
+    pending.asiChanges[ability] = amount;
   }
-  pending.asiChanges[ability] = (pending.asiChanges[ability] || 0) + amount;
+  updateASIDisplay();
+}
+
+function resetASI() {
+  if (window._levelUpPending) {
+    window._levelUpPending.asiChanges = {};
+    updateASIDisplay();
+  }
+}
+
+function updateASIDisplay() {
+  const pending = window._levelUpPending;
+  const totalUsed = Object.values(pending.asiChanges).reduce((s, v) => s + v, 0);
+
+  // Update pending text
   const el = document.getElementById('asi-pending');
   if (el) {
     const changes = Object.entries(pending.asiChanges).filter(([,v]) => v > 0).map(([a,v]) => `${a} +${v}`);
-    el.textContent = changes.length ? `Pending: ${changes.join(', ')} (${Object.values(pending.asiChanges).reduce((s,v)=>s+v,0)}/2 points used)` : '';
+    const span = el.querySelector('span');
+    if (span) span.textContent = changes.length ? `Pending: ${changes.join(', ')} (${totalUsed}/2 points used)` : '';
+    const resetBtn = document.getElementById('asi-reset-btn');
+    if (resetBtn) resetBtn.style.display = changes.length ? '' : 'none';
   }
+
+  // Highlight active buttons
+  document.querySelectorAll('#asi-controls button[data-asi]').forEach(btn => {
+    const btnAbility = btn.dataset.asi;
+    const btnAmount = parseInt(btn.dataset.amount);
+    const isActive = pending.asiChanges[btnAbility] === btnAmount;
+    btn.style.background = isActive ? 'var(--accent)' : '';
+    btn.style.color = isActive ? '#fff' : '';
+  });
 }
 
 async function applyLevelUp(charId) {
