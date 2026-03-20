@@ -564,6 +564,26 @@ function applySmartSpellFilters() {
   } else {
     classFilter.value = '';
   }
+  updateSpellSlotsInfo();
+}
+
+function updateSpellSlotsInfo() {
+  const el = document.getElementById('spell-slots-info');
+  if (!el) return;
+  const cls = document.getElementById('f-class').value;
+  const level = parseInt(document.getElementById('f-level').value) || 1;
+  const slots = getSpellSlots(cls, level);
+  if (slots.type === 'none' || (slots.type !== 'pact' && slots.slots.length === 0)) {
+    el.textContent = '';
+    return;
+  }
+  let text;
+  if (slots.type === 'pact') {
+    text = `Pact Magic: ${slots.slots} slot${slots.slots > 1 ? 's' : ''} at level ${slots.slotLevel}`;
+  } else {
+    text = 'Spell slots: ' + slots.slots.map((n, i) => `L${i + 1}: ${n}`).join(' · ');
+  }
+  el.textContent = text;
 }
 
 // --- Level Up ---
@@ -1089,6 +1109,8 @@ async function loadCharacters() {
   const chars = await db.getAllCharacters();
   allCharacters = chars;
   renderCharacterList(chars);
+  renderTreasures();
+  renderShops();
 }
 
 function renderCharacterList(chars) {
