@@ -103,12 +103,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     autoSetHP();
     updateHPBreakdown();
     applySmartSpellFilters();
+    updateSkillGuidance();
     // Auto-populate features when class changes (only for new characters)
     if (!document.getElementById('char-edit-id').value) autoPopulateFeatures();
   });
   document.getElementById('f-species').addEventListener('change', () => {
     // Auto-populate features when species changes (only for new characters)
     if (!document.getElementById('char-edit-id').value) autoPopulateFeatures();
+  });
+  document.getElementById('f-background').addEventListener('change', () => {
+    if (!document.getElementById('char-edit-id').value) {
+      autoPopulateFeatures();
+      autoPopulateSkills();
+    }
+    updateSkillGuidance();
   });
   document.getElementById('f-CON').addEventListener('input', () => {
     autoSetHP();
@@ -517,9 +525,11 @@ function autoPopulateFeatures() {
   const cls = document.getElementById('f-class').value;
   const species = document.getElementById('f-species').value;
   const level = parseInt(document.getElementById('f-level').value) || 1;
+  const bgSelect = document.getElementById('f-background');
+  const background = bgSelect.value === '__custom__' ? '' : bgSelect.value;
 
-  // Remove previously auto-added features (class + species only)
-  selectedFeatures = selectedFeatures.filter(f => f.source !== 'class' && f.source !== 'species');
+  // Remove previously auto-added features (class + species + background)
+  selectedFeatures = selectedFeatures.filter(f => f.source !== 'class' && f.source !== 'species' && f.source !== 'background');
 
   // Add class features up to current level
   if (cls) {
@@ -539,6 +549,15 @@ function autoPopulateFeatures() {
         selectedFeatures.push({ ...f });
       }
     });
+  }
+
+  // Add background origin feat
+  const featName = BACKGROUND_FEATS[background];
+  if (featName) {
+    const feat = allFeatures.find(f => f.source === 'feat' && f.name === featName);
+    if (feat && !selectedFeatures.find(s => s.name === feat.name && s.source === 'background')) {
+      selectedFeatures.push({ ...feat, source: 'background', sourceDetail: `${background} (Origin Feat)` });
+    }
   }
 
   renderSelectedFeatures();
@@ -1118,19 +1137,36 @@ function updateSavingThrows() {
 }
 
 // --- Skills form fields ---
+let _lastBgSkills = []; // track background-auto-checked skills for swap on change
+
 function renderSkillInputs(proficiencies) {
   const container = document.getElementById('skills-inputs');
+  const cls = document.getElementById('f-class').value;
+  const bgSelect = document.getElementById('f-background');
+  const background = bgSelect.value === '__custom__' ? '' : bgSelect.value;
+  const classInfo = CLASS_SKILLS[cls];
+  const bgSkills = BACKGROUND_SKILLS[background] || [];
+
   container.innerHTML = SKILL_ABILITIES.map((s, i) => {
     const checked = proficiencies && proficiencies[i] ? 'checked' : '';
+    const isBg = bgSkills.includes(s.name);
+    const isClassEligible = classInfo && (classInfo.choices === null || classInfo.choices.includes(s.name));
+    const borderStyle = isBg
+      ? 'border-left:3px solid var(--accent);'
+      : isClassEligible
+        ? 'border-left:3px solid #b8860b;'
+        : '';
+    const tag = isBg ? '<span style="font-size:0.65rem;color:var(--accent);margin-left:4px;font-style:italic;">BG</span>' : '';
     return `
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;min-height:44px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;min-height:44px;${borderStyle}">
         <input type="checkbox" id="f-skill-prof-${i}" ${checked} onchange="updateSkillModifiers()">
-        <span style="flex:1;font-size:0.9rem;font-weight:500;">${s.name}</span>
+        <span style="flex:1;font-size:0.9rem;font-weight:500;">${s.name}${tag}</span>
         <span style="color:var(--text-muted);font-size:0.75rem;white-space:nowrap;">${s.ability}</span>
         <span id="f-skill-mod-${i}" class="ability-mod-badge" style="min-width:36px;text-align:center;">+0</span>
       </div>`;
   }).join('');
   updateSkillModifiers();
+  updateSkillGuidance();
 }
 
 function updateSkillModifiers() {
@@ -1146,6 +1182,58 @@ function updateSkillModifiers() {
       modEl.className = 'ability-mod-badge' + (total > 0 ? ' positive' : total < 0 ? ' negative' : '');
     }
   });
+}
+
+function updateSkillGuidance() {
+  const infoEl = document.getElementById('skills-info');
+  if (!infoEl) return;
+  const cls = document.getElementById('f-class').value;
+  const bgSelect = document.getElementById('f-background');
+  const background = bgSelect.value === '__custom__' ? '' : bgSelect.value;
+  const classInfo = CLASS_SKILLS[cls];
+  const bgSkills = BACKGROUND_SKILLS[background] || [];
+  const parts = [];
+
+  if (bgSkills.length) {
+    parts.push(`<span style="color:var(--accent);"><b>${esc(background)}</b> grants: ${bgSkills.join(', ')}</span>`);
+  }
+  if (classInfo) {
+    const choiceText = classInfo.choices === null
+      ? 'any skill'
+      : classInfo.choices.join(', ');
+    parts.push(`<span style="color:#b8860b;"><b>${esc(cls)}</b>: Choose ${classInfo.count} from ${choiceText}</span>`);
+  }
+  infoEl.innerHTML = parts.length ? parts.join('<br>') : '';
+}
+
+function autoPopulateSkills() {
+  const bgSelect = document.getElementById('f-background');
+  const background = bgSelect.value === '__custom__' ? '' : bgSelect.value;
+  const newBgSkills = BACKGROUND_SKILLS[background] || [];
+
+  // Uncheck previously auto-set background skills
+  _lastBgSkills.forEach(skillName => {
+    const idx = SKILL_ABILITIES.findIndex(s => s.name === skillName);
+    if (idx >= 0) {
+      const cb = document.getElementById(`f-skill-prof-${idx}`);
+      if (cb) cb.checked = false;
+    }
+  });
+
+  // Check new background skills
+  newBgSkills.forEach(skillName => {
+    const idx = SKILL_ABILITIES.findIndex(s => s.name === skillName);
+    if (idx >= 0) {
+      const cb = document.getElementById(`f-skill-prof-${idx}`);
+      if (cb) cb.checked = true;
+    }
+  });
+
+  _lastBgSkills = [...newBgSkills];
+  updateSkillModifiers();
+  // Re-render to update visual indicators
+  const proficiencies = SKILL_ABILITIES.map((_, i) => document.getElementById(`f-skill-prof-${i}`)?.checked || false);
+  renderSkillInputs(proficiencies);
 }
 
 // --- Characters (IndexedDB) ---
@@ -1197,6 +1285,7 @@ async function openCharModal(id) {
   document.getElementById('spell-class-filter').value = '';
   document.getElementById('spell-results').style.display = 'none';
   selectedFeatures = [];
+  _lastBgSkills = [];
   renderSelectedFeatures();
   document.getElementById('feature-search').value = '';
   document.getElementById('feature-source-filter').value = '';

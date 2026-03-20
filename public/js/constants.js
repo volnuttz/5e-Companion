@@ -38,6 +38,39 @@ const CLASS_SAVING_THROWS = {
   Wizard:    ['INT', 'WIS']
 };
 
+// Background → Origin Feat mapping (SRD 5.2)
+const BACKGROUND_FEATS = {
+  Acolyte:  'Magic Initiate',
+  Criminal: 'Alert',
+  Sage:     'Magic Initiate',
+  Soldier:  'Savage Attacker'
+};
+
+// Background → Skill proficiencies (SRD 5.2)
+const BACKGROUND_SKILLS = {
+  Acolyte:  ['Insight', 'Religion'],
+  Criminal: ['Sleight of Hand', 'Stealth'],
+  Sage:     ['Arcana', 'History'],
+  Soldier:  ['Athletics', 'Intimidation']
+};
+
+// Class → Skill proficiency choices (SRD 5.2)
+// count = number of skills to choose, choices = eligible skills (null = any)
+const CLASS_SKILLS = {
+  Barbarian: { count: 2, choices: ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival'] },
+  Bard:      { count: 3, choices: null },
+  Cleric:    { count: 2, choices: ['History', 'Insight', 'Medicine', 'Persuasion', 'Religion'] },
+  Druid:     { count: 2, choices: ['Arcana', 'Animal Handling', 'Insight', 'Medicine', 'Nature', 'Perception', 'Religion', 'Survival'] },
+  Fighter:   { count: 2, choices: ['Acrobatics', 'Animal Handling', 'Athletics', 'History', 'Insight', 'Intimidation', 'Perception', 'Survival'] },
+  Monk:      { count: 2, choices: ['Acrobatics', 'Athletics', 'History', 'Insight', 'Religion', 'Stealth'] },
+  Paladin:   { count: 2, choices: ['Athletics', 'Insight', 'Intimidation', 'Medicine', 'Persuasion', 'Religion'] },
+  Ranger:    { count: 3, choices: ['Animal Handling', 'Athletics', 'Insight', 'Investigation', 'Nature', 'Perception', 'Stealth', 'Survival'] },
+  Rogue:     { count: 4, choices: ['Acrobatics', 'Athletics', 'Deception', 'Insight', 'Intimidation', 'Investigation', 'Perception', 'Performance', 'Persuasion', 'Sleight of Hand', 'Stealth'] },
+  Sorcerer:  { count: 2, choices: ['Arcana', 'Deception', 'Insight', 'Intimidation', 'Persuasion', 'Religion'] },
+  Warlock:   { count: 2, choices: ['Arcana', 'Deception', 'History', 'Intimidation', 'Investigation', 'Nature', 'Religion'] },
+  Wizard:    { count: 2, choices: ['Arcana', 'History', 'Insight', 'Investigation', 'Medicine', 'Religion'] }
+};
+
 // Spellcasting ability per class
 const SPELLCASTING_ABILITY = {
   Bard: 'CHA',
