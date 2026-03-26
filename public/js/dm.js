@@ -353,11 +353,33 @@ async function clearWorkspace() {
 function populateDropdowns() {
   const classSelect = document.getElementById('f-class');
   classSelect.innerHTML = '<option value="">Select class...</option>' +
-    CLASSES.map(c => `<option value="${c}">${c}</option>`).join('');
+    CLASSES.map(c => `<option value="${c}">${c}</option>`).join('') +
+    '<option value="__custom__">+ Add Custom</option>';
+  classSelect.addEventListener('change', () => {
+    const customInput = document.getElementById('f-class-custom');
+    if (classSelect.value === '__custom__') {
+      customInput.style.display = '';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+      customInput.value = '';
+    }
+  });
 
   const speciesSelect = document.getElementById('f-species');
   speciesSelect.innerHTML = '<option value="">Select species...</option>' +
-    SPECIES.map(s => `<option value="${s}">${s}</option>`).join('');
+    SPECIES.map(s => `<option value="${s}">${s}</option>`).join('') +
+    '<option value="__custom__">+ Add Custom</option>';
+  speciesSelect.addEventListener('change', () => {
+    const customInput = document.getElementById('f-species-custom');
+    if (speciesSelect.value === '__custom__') {
+      customInput.style.display = '';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+      customInput.value = '';
+    }
+  });
 
   const bgSelect = document.getElementById('f-background');
   bgSelect.innerHTML = '<option value="">Select background...</option>' +
@@ -620,10 +642,8 @@ async function openLevelUpModal(charId) {
   if (newLevel > 20) { dialogAlert('Character is already at maximum level (20).', 'Level Up', 'info'); return; }
 
   const cls = c.class;
-  const hitDie = HIT_DIE[cls] || 8;
+  const hitDie = HIT_DIE[cls]; // undefined for custom classes
   const conMod = Math.floor(((c.CON || 10) - 10) / 2);
-  const avg = Math.floor(hitDie / 2) + 1;
-  const avgHP = avg + conMod;
   const profOld = calcProfBonus(oldLevel);
   const profNew = calcProfBonus(newLevel);
 
@@ -651,14 +671,27 @@ async function openLevelUpModal(charId) {
   </div>`;
 
   // HP section
-  html += `<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:12px;">
-    <strong>Hit Points</strong> (d${hitDie} + ${conMod >= 0 ? '+' : ''}${conMod} CON)
-    <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-      <button type="button" class="btn btn-primary btn-small" onclick="levelUpRollHP('${charId}', ${hitDie}, ${conMod})">Roll d${hitDie}</button>
-      <button type="button" class="btn btn-secondary btn-small" onclick="levelUpAvgHP('${charId}', ${avgHP})">Take Average (+${avgHP})</button>
-      <span id="levelup-hp-result" style="font-weight:600;"></span>
-    </div>
-  </div>`;
+  if (hitDie) {
+    const avg = Math.floor(hitDie / 2) + 1;
+    const avgHP = avg + conMod;
+    html += `<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:12px;">
+      <strong>Hit Points</strong> (d${hitDie} + ${conMod >= 0 ? '+' : ''}${conMod} CON)
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+        <button type="button" class="btn btn-primary btn-small" onclick="levelUpRollHP('${charId}', ${hitDie}, ${conMod})">Roll d${hitDie}</button>
+        <button type="button" class="btn btn-secondary btn-small" onclick="levelUpAvgHP('${charId}', ${avgHP})">Take Average (+${avgHP})</button>
+        <span id="levelup-hp-result" style="font-weight:600;"></span>
+      </div>
+    </div>`;
+  } else {
+    html += `<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:12px;">
+      <strong>Hit Points</strong> (Custom class — enter HP gain manually)
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+        <input type="number" id="levelup-manual-hp" class="input input-bordered" style="width:80px;" min="1" placeholder="HP">
+        <button type="button" class="btn btn-secondary btn-small" onclick="levelUpManualHP('${charId}')">Set HP Gain</button>
+        <span id="levelup-hp-result" style="font-weight:600;"></span>
+      </div>
+    </div>`;
+  }
 
   // Proficiency bonus change
   if (profNew > profOld) {
@@ -736,6 +769,18 @@ function levelUpRollHP(charId, hitDie, conMod) {
 function levelUpAvgHP(charId, avgHP) {
   window._levelUpPending.hpGain = Math.max(1, avgHP);
   document.getElementById('levelup-hp-result').textContent = `Average = +${Math.max(1, avgHP)} HP`;
+  document.getElementById('levelup-hp-result').style.color = 'var(--text)';
+}
+
+function levelUpManualHP(charId) {
+  const input = document.getElementById('levelup-manual-hp');
+  const val = parseInt(input.value);
+  if (!val || val < 1) {
+    showToast('Enter a positive HP value');
+    return;
+  }
+  window._levelUpPending.hpGain = val;
+  document.getElementById('levelup-hp-result').textContent = `Manual = +${val} HP`;
   document.getElementById('levelup-hp-result').style.color = 'var(--text)';
 }
 
@@ -1275,6 +1320,10 @@ async function openCharModal(id) {
   document.getElementById('equip-search').value = '';
   document.getElementById('equip-type-filter').value = '';
   document.getElementById('equip-results').style.display = 'none';
+  document.getElementById('f-class-custom').style.display = 'none';
+  document.getElementById('f-class-custom').value = '';
+  document.getElementById('f-species-custom').style.display = 'none';
+  document.getElementById('f-species-custom').value = '';
   document.getElementById('f-background-custom').style.display = 'none';
   document.getElementById('f-background-custom').value = '';
   ['cp','sp','ep','gp','pp'].forEach(k => { document.getElementById(`f-${k}`).value = 0; });
@@ -1301,8 +1350,30 @@ async function openCharModal(id) {
     if (!c) return;
     document.getElementById('char-edit-id').value = id;
     document.getElementById('f-name').value = c.name || '';
-    document.getElementById('f-class').value = c.class || '';
-    document.getElementById('f-species').value = c.species || '';
+    const classVal = c.class || '';
+    const classSelectEl = document.getElementById('f-class');
+    const classCustomEl = document.getElementById('f-class-custom');
+    if (classVal && !CLASSES.includes(classVal)) {
+      classSelectEl.value = '__custom__';
+      classCustomEl.style.display = '';
+      classCustomEl.value = classVal;
+    } else {
+      classSelectEl.value = classVal;
+      classCustomEl.style.display = 'none';
+      classCustomEl.value = '';
+    }
+    const speciesVal = c.species || '';
+    const speciesSelectEl = document.getElementById('f-species');
+    const speciesCustomEl = document.getElementById('f-species-custom');
+    if (speciesVal && !SPECIES.includes(speciesVal)) {
+      speciesSelectEl.value = '__custom__';
+      speciesCustomEl.style.display = '';
+      speciesCustomEl.value = speciesVal;
+    } else {
+      speciesSelectEl.value = speciesVal;
+      speciesCustomEl.style.display = 'none';
+      speciesCustomEl.value = '';
+    }
     document.getElementById('f-level').value = c.level || 1;
     const bgVal = c.background || '';
     const bgSelect = document.getElementById('f-background');
@@ -1365,10 +1436,20 @@ function closeCharModal() {
 async function saveCharacter(e) {
   e.preventDefault();
   const id = document.getElementById('char-edit-id').value;
+  if (document.getElementById('f-class').value === '__custom__' && !document.getElementById('f-class-custom').value.trim()) {
+    showToast('Please enter a custom class name'); return;
+  }
+  if (document.getElementById('f-species').value === '__custom__' && !document.getElementById('f-species-custom').value.trim()) {
+    showToast('Please enter a custom species name'); return;
+  }
   const character = {
     name: document.getElementById('f-name').value,
-    class: document.getElementById('f-class').value,
-    species: document.getElementById('f-species').value,
+    class: document.getElementById('f-class').value === '__custom__'
+      ? document.getElementById('f-class-custom').value
+      : document.getElementById('f-class').value,
+    species: document.getElementById('f-species').value === '__custom__'
+      ? document.getElementById('f-species-custom').value
+      : document.getElementById('f-species').value,
     level: parseInt(document.getElementById('f-level').value),
     background: document.getElementById('f-background').value === '__custom__'
       ? document.getElementById('f-background-custom').value
