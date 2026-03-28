@@ -1,23 +1,4 @@
-const SKILL_ABILITIES = [
-  { name: 'Acrobatics',      ability: 'DEX' },
-  { name: 'Animal Handling',  ability: 'WIS' },
-  { name: 'Arcana',          ability: 'INT' },
-  { name: 'Athletics',       ability: 'STR' },
-  { name: 'Deception',       ability: 'CHA' },
-  { name: 'History',         ability: 'INT' },
-  { name: 'Insight',         ability: 'WIS' },
-  { name: 'Intimidation',    ability: 'CHA' },
-  { name: 'Investigation',   ability: 'INT' },
-  { name: 'Medicine',        ability: 'WIS' },
-  { name: 'Nature',          ability: 'INT' },
-  { name: 'Perception',      ability: 'WIS' },
-  { name: 'Performance',     ability: 'CHA' },
-  { name: 'Persuasion',      ability: 'CHA' },
-  { name: 'Religion',        ability: 'INT' },
-  { name: 'Sleight of Hand', ability: 'DEX' },
-  { name: 'Stealth',         ability: 'DEX' },
-  { name: 'Survival',        ability: 'WIS' }
-];
+// SKILL_ABILITIES is defined in constants.js
 
 function calcProfBonus(level) {
   return Math.ceil(level / 4) + 1;
@@ -145,9 +126,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // DM page tabs
   document.querySelectorAll('.tabs .tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('tab-active'));
+      document.querySelectorAll('.tabs .tab').forEach(t => {
+        t.classList.remove('tab-active');
+        t.setAttribute('aria-selected', 'false');
+      });
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       tab.classList.add('tab-active');
+      tab.setAttribute('aria-selected', 'true');
       document.getElementById(tab.dataset.tab).classList.add('active');
       if (tab.dataset.tab === 'dm-tab-battlefield') renderBattlefieldCharacters();
     });

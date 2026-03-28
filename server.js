@@ -13,11 +13,11 @@ const DATA_DIR = path.join(__dirname, 'data');
 
 // Static SRD reference data (read-only, loaded once)
 const srdData = {
-  spells: JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-spells.json'), 'utf-8')),
-  feats: JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-feats.json'), 'utf-8')),
-  speciesTraits: JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-species-traits.json'), 'utf-8')),
-  equipment: JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-equipment.json'), 'utf-8')),
-  monsters: (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-monsters.json'), 'utf-8')); } catch(e) { return []; } })(),
+  spells:        (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-spells.json'), 'utf-8')); } catch(e) { console.error('Failed to load spells:', e.message); return []; } })(),
+  feats:         (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-feats.json'), 'utf-8')); } catch(e) { console.error('Failed to load feats:', e.message); return []; } })(),
+  speciesTraits: (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-species-traits.json'), 'utf-8')); } catch(e) { console.error('Failed to load species traits:', e.message); return []; } })(),
+  equipment:     (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-equipment.json'), 'utf-8')); } catch(e) { console.error('Failed to load equipment:', e.message); return []; } })(),
+  monsters:      (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-monsters.json'), 'utf-8')); } catch(e) { return []; } })(),
   classFeatures: (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'srd-5.2-class-features.json'), 'utf-8')); } catch(e) { return {}; } })()
 };
 
@@ -27,6 +27,14 @@ app.use('/peerjs', peerServer);
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));

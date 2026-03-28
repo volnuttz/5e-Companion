@@ -92,15 +92,15 @@
 
         <!-- DM Tabs -->
         <div role="tablist" class="tabs tabs-bordered">
-          <button role="tab" class="tab tab-active" data-tab="dm-tab-characters">Characters</button>
-          <button role="tab" class="tab" data-tab="dm-tab-battlefield">Battlefield</button>
-          <button role="tab" class="tab" data-tab="dm-tab-treasures">Treasures</button>
-          <button role="tab" class="tab" data-tab="dm-tab-shops">Shops</button>
-          <button role="tab" class="tab" data-tab="dm-tab-notes">Notes</button>
+          <button role="tab" id="tab-btn-characters" class="tab tab-active" data-tab="dm-tab-characters" aria-selected="true" aria-controls="dm-tab-characters">Characters</button>
+          <button role="tab" id="tab-btn-battlefield" class="tab" data-tab="dm-tab-battlefield" aria-selected="false" aria-controls="dm-tab-battlefield">Battlefield</button>
+          <button role="tab" id="tab-btn-treasures" class="tab" data-tab="dm-tab-treasures" aria-selected="false" aria-controls="dm-tab-treasures">Treasures</button>
+          <button role="tab" id="tab-btn-shops" class="tab" data-tab="dm-tab-shops" aria-selected="false" aria-controls="dm-tab-shops">Shops</button>
+          <button role="tab" id="tab-btn-notes" class="tab" data-tab="dm-tab-notes" aria-selected="false" aria-controls="dm-tab-notes">Notes</button>
         </div>
 
         <!-- ── CHARACTERS TAB ── -->
-        <div class="tab-content active" id="dm-tab-characters">
+        <div role="tabpanel" class="tab-content active" id="dm-tab-characters" aria-labelledby="tab-btn-characters">
           <div class="card card-compact bg-base-100 shadow-md">
             <div class="card-body">
               <div class="flex justify-end mb-3">
@@ -112,7 +112,7 @@
         </div>
 
         <!-- ── BATTLEFIELD TAB ── -->
-        <div class="tab-content" id="dm-tab-battlefield">
+        <div role="tabpanel" class="tab-content" id="dm-tab-battlefield" aria-labelledby="tab-btn-battlefield">
           <div class="card card-compact bg-base-100 shadow-md">
             <div class="card-body">
               <div class="flex justify-end gap-2 mb-3">
@@ -128,7 +128,7 @@
         </div>
 
         <!-- ── TREASURES TAB ── -->
-        <div class="tab-content" id="dm-tab-treasures">
+        <div role="tabpanel" class="tab-content" id="dm-tab-treasures" aria-labelledby="tab-btn-treasures">
           <div class="card card-compact bg-base-100 shadow-md">
             <div class="card-body">
               <div class="flex justify-end gap-2 mb-3">
@@ -142,7 +142,7 @@
         </div>
 
         <!-- ── SHOPS TAB ── -->
-        <div class="tab-content" id="dm-tab-shops">
+        <div role="tabpanel" class="tab-content" id="dm-tab-shops" aria-labelledby="tab-btn-shops">
           <div class="card card-compact bg-base-100 shadow-md">
             <div class="card-body">
               <div class="flex justify-end mb-3">
@@ -155,7 +155,7 @@
         </div>
 
         <!-- ── NOTES TAB ── -->
-        <div class="tab-content" id="dm-tab-notes">
+        <div role="tabpanel" class="tab-content" id="dm-tab-notes" aria-labelledby="tab-btn-notes">
           <div class="card card-compact bg-base-100 shadow-md">
             <div class="card-body">
               <div class="flex justify-end mb-3">
@@ -231,7 +231,7 @@
         <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('qr-modal').close()">✕</button>
       </div>
       <div class="qr-container modal-body">
-        <canvas id="qr-canvas"></canvas>
+        <canvas id="qr-canvas" role="img" aria-label="Session QR code"></canvas>
         <div class="qr-url" id="qr-url"></div>
         <button class="btn btn-secondary btn-small mt-2" id="btn-copy-url" onclick="copySessionUrl()">Copy URL</button>
         <div class="mt-3 text-lg">

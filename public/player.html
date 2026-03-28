@@ -30,8 +30,8 @@
       <div class="card-body">
         <h2 class="card-title" style="font-family:var(--font-heading);color:var(--accent);">Join Session</h2>
         <div class="form-group mt-2">
-          <label>Session PIN</label>
-          <input type="text" id="player-pin" placeholder="Enter PIN…" autofocus inputmode="text" autocomplete="off">
+          <label for="player-pin">Session PIN</label>
+          <input type="password" id="player-pin" placeholder="Enter PIN…" autofocus inputmode="numeric" autocomplete="current-password">
         </div>
         <div id="join-error" style="color:var(--accent);font-size:0.9rem;margin-bottom:8px;display:none;"></div>
         <button class="btn btn-primary w-full" id="btn-join">Join Session</button>
@@ -51,13 +51,13 @@
 
       <!-- Character Sheet Tabs -->
       <div role="tablist" class="tabs tabs-bordered">
-        <button role="tab" class="tab tab-active" data-tab="tab-stats">Stats</button>
-        <button role="tab" class="tab" data-tab="tab-equipment">Equipment</button>
-        <button role="tab" class="tab" data-tab="tab-spells">Spells</button>
+        <button role="tab" id="tab-btn-stats" class="tab tab-active" data-tab="tab-stats" aria-selected="true" aria-controls="tab-stats">Stats</button>
+        <button role="tab" id="tab-btn-equipment" class="tab" data-tab="tab-equipment" aria-selected="false" aria-controls="tab-equipment">Equipment</button>
+        <button role="tab" id="tab-btn-spells" class="tab" data-tab="tab-spells" aria-selected="false" aria-controls="tab-spells">Spells</button>
       </div>
 
       <!-- Stats Tab -->
-      <div class="tab-content active" id="tab-stats">
+      <div role="tabpanel" class="tab-content active" id="tab-stats" aria-labelledby="tab-btn-stats">
         <div class="combat-stats" id="combat-stats"></div>
         <h3 class="mt-4 mb-2">Ability Scores</h3>
         <div class="stat-grid" id="ability-grid"></div>
@@ -70,12 +70,12 @@
       </div>
 
       <!-- Equipment Tab -->
-      <div class="tab-content" id="tab-equipment">
+      <div role="tabpanel" class="tab-content" id="tab-equipment" aria-labelledby="tab-btn-equipment">
         <div id="equipment-display"></div>
       </div>
 
       <!-- Spells Tab -->
-      <div class="tab-content" id="tab-spells">
+      <div role="tabpanel" class="tab-content" id="tab-spells" aria-labelledby="tab-btn-spells">
         <div id="spellcasting-info"></div>
         <div id="spell-slots-display"></div>
         <div id="spells-display"></div>

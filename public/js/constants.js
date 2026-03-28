@@ -22,6 +22,28 @@ const HIT_DIE = {
 
 const ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
+// Skill → ability score mapping (18 skills, SRD 5.2)
+const SKILL_ABILITIES = [
+  { name: 'Acrobatics',      ability: 'DEX' },
+  { name: 'Animal Handling', ability: 'WIS' },
+  { name: 'Arcana',          ability: 'INT' },
+  { name: 'Athletics',       ability: 'STR' },
+  { name: 'Deception',       ability: 'CHA' },
+  { name: 'History',         ability: 'INT' },
+  { name: 'Insight',         ability: 'WIS' },
+  { name: 'Intimidation',    ability: 'CHA' },
+  { name: 'Investigation',   ability: 'INT' },
+  { name: 'Medicine',        ability: 'WIS' },
+  { name: 'Nature',          ability: 'INT' },
+  { name: 'Perception',      ability: 'WIS' },
+  { name: 'Performance',     ability: 'CHA' },
+  { name: 'Persuasion',      ability: 'CHA' },
+  { name: 'Religion',        ability: 'INT' },
+  { name: 'Sleight of Hand', ability: 'DEX' },
+  { name: 'Stealth',         ability: 'DEX' },
+  { name: 'Survival',        ability: 'WIS' }
+];
+
 // Saving throw proficiencies per class (SRD 5.2)
 const CLASS_SAVING_THROWS = {
   Barbarian: ['STR', 'CON'],
