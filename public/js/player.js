@@ -264,7 +264,7 @@ function renderCharacterPicker(characters) {
   }).join('');
 
   if (characters.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-muted)">No characters available.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted)">No characters available yet. Wait for your DM to add characters to the session.</p>';
   }
 }
 

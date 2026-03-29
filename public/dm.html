@@ -121,7 +121,7 @@
               </div>
               <div id="battlefield-list"></div>
               <div id="bf-characters-list"></div>
-              <p id="battlefield-empty" style="color:var(--text-muted);font-size:0.9rem;">No monsters on the battlefield.</p>
+              <p id="battlefield-empty" style="color:var(--text-muted);font-size:0.9rem;">No monsters on the battlefield. Use "Add Monsters" to search the SRD, or "+ Add Custom" for homebrew creatures.</p>
               <p id="bf-characters-empty" style="color:var(--text-muted);font-size:0.9rem;">No active session. Start a session to track character HP.</p>
             </div>
           </div>
@@ -136,7 +136,7 @@
                 <button class="btn btn-secondary btn-small" onclick="addCustomTreasure()">+ Add Custom</button>
               </div>
               <div id="treasure-list"></div>
-              <p id="treasure-empty" style="color:var(--text-muted);font-size:0.9rem;">No items in the treasure pool.</p>
+              <p id="treasure-empty" style="color:var(--text-muted);font-size:0.9rem;">No items in the treasure pool. Use "Add Items" to pick from the SRD, or "+ Add Custom" for homebrew loot.</p>
             </div>
           </div>
         </div>
@@ -193,24 +193,24 @@
         <div class="sidebar-section">
           <h3>Characters</h3>
           <input type="file" id="import-char-file" accept=".toml" style="display:none;" onchange="importCharacterFile(event)">
-          <button class="btn btn-sm sidebar-btn" onclick="document.getElementById('import-char-file').click()">
+          <button class="btn btn-sm sidebar-btn" title="Import a character from a .toml file" onclick="document.getElementById('import-char-file').click()">
             Import Character
           </button>
-          <button class="btn btn-sm sidebar-btn" id="btn-export-all-chars">
-            Export Character
+          <button class="btn btn-sm sidebar-btn" id="btn-export-all-chars" title="Export characters as .toml files">
+            Export Characters
           </button>
         </div>
 
         <div class="sidebar-section">
           <h3>Workspace</h3>
-          <button class="btn btn-sm sidebar-btn" id="btn-save-workspace" aria-label="Save Workspace">
+          <button class="btn btn-sm sidebar-btn" id="btn-save-workspace" aria-label="Save Workspace" title="Download all characters, battlefield, shops, and notes as a JSON backup">
             Save Workspace
           </button>
           <input type="file" id="load-workspace-file" accept=".json" style="display:none;">
-          <button class="btn btn-sm sidebar-btn" aria-label="Load Workspace" onclick="document.getElementById('load-workspace-file').click()">
+          <button class="btn btn-sm sidebar-btn" aria-label="Load Workspace" title="Restore a previously saved workspace from a JSON file" onclick="document.getElementById('load-workspace-file').click()">
             Load Workspace
           </button>
-          <button class="btn btn-sm sidebar-btn btn-danger" id="btn-clear-workspace" aria-label="Clear Workspace">
+          <button class="btn btn-sm sidebar-btn btn-danger" id="btn-clear-workspace" aria-label="Clear Workspace" title="Delete all characters and session data — this cannot be undone">
             Clear Workspace
           </button>
         </div>

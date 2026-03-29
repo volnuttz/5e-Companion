@@ -1278,7 +1278,7 @@ async function loadCharacters() {
 function renderCharacterList(chars) {
   const container = document.getElementById('char-list');
   if (chars.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-muted)">No characters yet. Create one to get started.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted)">No characters yet. Click &ldquo;+ New Character&rdquo; to create one, or use the menu to import from a TOML file.</p>';
     return;
   }
   container.innerHTML = chars.map(c => `

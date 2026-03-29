@@ -9,14 +9,14 @@
 - **Backend:** Node.js + Express 5.2.1 (static file server + SRD data API only)
 - **Storage:** IndexedDB in DM's browser (no server-side database)
 - **Real-time:** PeerJS/WebRTC for DM-to-player communication
-- **Frontend:** Vanilla HTML/CSS/JS (no frameworks, no build process)
+- **Frontend:** Vanilla HTML/CSS/JS with DaisyUI 4.x + Tailwind CSS (CDN, no build process)
 - **SRD Data:** 5.2 reference data (CC BY 4.0) as read-only JSON in `data/`
-- **External libs (CDN):** PeerJS 1.x, QRCode.js 1.x
+- **External libs (CDN):** DaisyUI 4.x, Tailwind CSS, PeerJS 1.x, QRCode.js 1.x
 
 ## Directory Structure
 
 ```
-server.js                        Express server (58 lines)
+server.js                        Express server (72 lines)
 package.json                     Dependencies (express only)
 data/
   srd-5.2-spells.json            ~500+ spells (342 KB)
@@ -26,16 +26,16 @@ data/
   srd-5.2-species-traits.json    10 playable species traits (4.5 KB)
   srd-5.2-feats.json             Feats (3.5 KB)
 public/
-  dm.html                        DM dashboard (508 lines)
+  dm.html                        DM dashboard (595 lines)
   player.html                    Player character sheet (108 lines)
-  css/style.css                  Parchment theme (1099 lines)
+  css/style.css                  Parchment/DaisyUI theme (1273 lines)
   img/background_texture.png     Background texture
   js/
-    constants.js                 Game tables, class data, skills (141 lines)
+    constants.js                 Game tables, class data, skills (237 lines)
     db.js                        IndexedDB abstraction layer (255 lines)
-    peer.js                      PeerJS communication layer (373 lines)
-    dm.js                        DM dashboard logic (2302 lines)
-    player.js                    Player sheet logic (561 lines)
+    peer.js                      PeerJS communication layer (381 lines)
+    dm.js                        DM dashboard logic (2963 lines)
+    player.js                    Player sheet logic (570 lines)
 ```
 
 ## Key Files

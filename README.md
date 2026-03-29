@@ -9,7 +9,9 @@ A web app for tabletop 5.5e sessions. DMs manage characters and track battlefiel
 - **Battlefield** - Track monster and character HP, view stat blocks during encounters
 - **Treasures & Shops** - Manage loot pools and shops, assign items to characters
 - **Real-time Updates** - Character changes sync instantly to players via PeerJS/WebRTC
-- **Workspace Management** - Save, load, and clear workspace data
+- **Workspace Management** - Save, load, and clear workspace data (JSON backup/restore)
+- **Character Import/Export** - Import characters from TOML files; export for sharing or backup
+- **Session Notes** - Persistent auto-saving freeform notes per session
 - **SRD 5.2 Data** - Pre-loaded spells, monsters, equipment, class features, species traits, and feats
 
 ## Tech Stack
@@ -17,7 +19,7 @@ A web app for tabletop 5.5e sessions. DMs manage characters and track battlefiel
 - **Backend:** Node.js, Express 5 (static file server + SRD data API)
 - **Storage:** IndexedDB (client-side, DM's browser is source of truth)
 - **Real-time:** PeerJS / WebRTC data channels
-- **Frontend:** Vanilla HTML/CSS/JS (no frameworks)
+- **Frontend:** Vanilla HTML/CSS/JS + DaisyUI 4 + Tailwind CSS (CDN, no build step)
 
 ## Prerequisites
 
