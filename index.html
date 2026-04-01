@@ -558,6 +558,21 @@
     <form method="dialog" class="modal-backdrop"><button>close</button></form>
   </dialog>
 
+  <!-- Character Preview Modal (Player-sheet view, shared URL) -->
+  <dialog id="char-preview-modal" class="modal">
+    <div class="modal-box w-full max-w-5xl" style="min-height:80vh;">
+      <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <h2>Character Preview</h2>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-secondary btn-sm" onclick="copyCurrentPreviewLink()">Copy share link</button>
+          <button class="btn btn-sm btn-circle btn-ghost" onclick="document.getElementById('char-preview-modal').close()">✕</button>
+        </div>
+      </div>
+      <iframe id="char-preview-iframe" class="w-full mt-2" style="height:calc(100vh - 220px);border:1px solid var(--border);"></iframe>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
   <!-- Generic Dialog Modal (alert / confirm / prompt) -->
   <dialog id="dialog-overlay" class="modal">
     <div class="modal-box max-w-md text-center">

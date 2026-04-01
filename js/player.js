@@ -47,6 +47,25 @@ function hideBanner() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // If ?shared=<base64UTF8-encoded JSON> is provided, render that character without joining a session.
+  const sharedData = new URLSearchParams(window.location.search).get('shared');
+  if (sharedData) {
+    try {
+      const json = decodeURIComponent(escape(atob(decodeURIComponent(sharedData))));
+      const character = JSON.parse(json);
+      currentCharacter = character;
+      currentHPState = { currentHP: character.HP || 0, tempHP: 0 };
+      activeCharacterId = character._id || 'shared-character';
+      document.getElementById('step-join').style.display = 'none';
+      document.getElementById('step-pick').style.display = 'none';
+      document.getElementById('step-sheet').style.display = '';
+      renderCharacterSheet(character, currentHPState);
+    } catch (err) {
+      console.error('Unable to decode shared character payload:', err);
+      // Fall back to normal join flow
+    }
+  }
+
   document.getElementById('btn-join').addEventListener('click', joinSession);
   document.getElementById('player-pin').addEventListener('keydown', e => {
     if (e.key === 'Enter') joinSession();

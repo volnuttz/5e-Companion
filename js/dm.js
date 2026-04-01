@@ -208,6 +208,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadTreasures();
     await loadShops();
     loadNotes();
+
+    // Show character preview if link includes preview=<encoded JSON>
+    openCharacterPreviewFromUrl();
   } catch (e) {
     console.error('Error loading data:', e);
   }
@@ -1282,17 +1285,104 @@ function renderCharacterList(chars) {
     return;
   }
   container.innerHTML = chars.map(c => `
-    <div class="char-item" onclick="openCharModal('${c._id}')">
+    <div class="char-item" onclick="openCharacterPreview('${c._id}')">
       <div class="char-info">
         <span class="char-name">${esc(c.name)}</span>
         <span class="char-meta">Level ${c.level} ${esc(c.species || '')} ${esc(c.class)} — HP ${c.HP} / AC ${c.AC}</span>
       </div>
       <div class="char-item-actions" style="display:flex;gap:6px;">
+        <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="event.stopPropagation();openCharModal('${c._id}')" title="Edit character">Edit</button>
         ${c.level < 20 ? `<button class="btn btn-secondary btn-small" style="font-size:0.72rem;padding:0.2rem 0.5rem;min-height:1.6rem;" onclick="event.stopPropagation();openLevelUpModal('${c._id}')" title="Level Up">Lvl Up</button>` : ''}
         <button class="remove-item" onclick="event.stopPropagation();deleteCharacter('${c._id}')" title="Delete">&times;</button>
       </div>
     </div>
   `).join('');
+}
+
+let _currentPreviewCharacter = null;
+
+function encodeCharacterForUrl(character) {
+  const json = JSON.stringify(character);
+  try {
+    return encodeURIComponent(btoa(unescape(encodeURIComponent(json))));
+  } catch (err) {
+    return encodeURIComponent(json);
+  }
+}
+
+function decodeCharacterFromUrl(encoded) {
+  try {
+    const decoded = decodeURIComponent(atob(decodeURIComponent(encoded)));
+    return JSON.parse(decoded);
+  } catch (err) {
+    return JSON.parse(decodeURIComponent(encoded));
+  }
+}
+
+function getCharacterShareUrl(character) {
+  const encoded = encodeCharacterForUrl(character);
+  const playerUrl = new URL('player.html', window.location.href);
+  playerUrl.searchParams.set('shared', encoded);
+  return playerUrl.toString();
+}
+
+function openCharacterPreview(id) {
+  const char = allCharacters.find(c => c._id === id);
+  if (!char) {
+    dialogAlert('Character not found.', 'Error', 'error');
+    return;
+  }
+  _currentPreviewCharacter = char;
+  const shareUrl = getCharacterShareUrl(char);
+  const previewModal = document.getElementById('char-preview-modal');
+  const iframe = document.getElementById('char-preview-iframe');
+  if (!previewModal || !iframe) return;
+  iframe.src = shareUrl;
+  previewModal.showModal();
+}
+
+function copyCharacterShareLink(id) {
+  const char = allCharacters.find(c => c._id === id);
+  if (!char) {
+    dialogAlert('Character not found.', 'Error', 'error');
+    return;
+  }
+  const url = getCharacterShareUrl(char);
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Share link copied to clipboard.');
+  }).catch(() => {
+    dialogAlert('Could not copy link. Please copy manually from the preview link.', 'Error', 'error');
+  });
+}
+
+function copyCurrentPreviewLink() {
+  if (!_currentPreviewCharacter) return;
+  const url = getCharacterShareUrl(_currentPreviewCharacter);
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Share link copied to clipboard.');
+  }).catch(() => {
+    dialogAlert('Could not copy link. Please copy manually from the preview link.', 'Error', 'error');
+  });
+}
+
+function openCharacterPreviewFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const encoded = params.get('preview');
+  if (!encoded) return;
+  let char;
+  try {
+    char = decodeCharacterFromUrl(encoded);
+  } catch (err) {
+    console.error('Invalid preview parameter:', err);
+    return;
+  }
+  _currentPreviewCharacter = char;
+  const shareUrl = getCharacterShareUrl(char);
+  const previewModal = document.getElementById('char-preview-modal');
+  const iframe = document.getElementById('char-preview-iframe');
+  if (!previewModal || !iframe) return;
+  iframe.src = shareUrl;
+  previewModal.showModal();
 }
 
 // --- Character Modal ---
